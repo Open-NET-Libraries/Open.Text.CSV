@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Open.Text.CSV</AssemblyName>
+    <RootNamespace>Open.Text.CSV</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>electricessence</Authors>
+    <Company>electricessence</Company>
+    <Description>A set of utilities for reading and writing CSV data in C#. 
+
+Part of the "Open" set of libraries.</Description>
+    <Copyright>https://github.com/electricessence/Open.Text.CSV/blob/master/LISCENSE.md</Copyright>
+    <PackageLicenseUrl>https://github.com/electricessence/Open.Text.CSV/blob/master/LISCENSE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/electricessence/Open.Text.CSV/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/electricessence/Open.Text.CSV/</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CsvData.cs" />
+    <Compile Remove="Web.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove=".git" />
+    <None Remove=".gitignore" />
+    <None Remove="LICENSE" />
+    <None Remove="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Open.Disposable" Version="1.0.4" />
+    <PackageReference Include="Open.Text" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
