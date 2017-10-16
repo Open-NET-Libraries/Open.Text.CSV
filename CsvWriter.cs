@@ -12,7 +12,7 @@ namespace Open.Text.CSV
 
 		public CsvWriter(TextWriter target)
 		{
-			target = Target;
+			Target = target;
 		}
 
 		protected override void OnDispose(bool calledExplicitly)
