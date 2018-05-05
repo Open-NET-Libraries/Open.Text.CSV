@@ -1,8 +1,8 @@
 ﻿using Open.Disposable;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
-using System.Text;
 
 namespace Open.Text.CSV
 {
@@ -38,7 +38,8 @@ namespace Open.Text.CSV
 		public static bool TryGetRow(StreamReader source, out string[] row, ref int maxColumns)
 		{
 			if (source == null)
-				throw new ArgumentNullException("source");
+				throw new ArgumentNullException(nameof(source));
+			Contract.EndContractBlock();
 
 			if (!source.EndOfStream)
 			{
@@ -59,12 +60,13 @@ namespace Open.Text.CSV
 		public static string[][] GetRows(StreamReader source, out int maxColumns)
 		{
 			if (source == null)
-				throw new ArgumentNullException("source");
+				throw new ArgumentNullException(nameof(source));
+			Contract.EndContractBlock();
 
 			maxColumns = 0;
 			var lines = new List<string[]>();
 			while (TryGetRow(source, out string[] row, ref maxColumns))
-					lines.Add(row);
+				lines.Add(row);
 
 			return lines.ToArray();
 		}
@@ -72,9 +74,10 @@ namespace Open.Text.CSV
 		public static string[][] GetRowsFromFile(string filepath, out int maxColumns)
 		{
 			if (filepath == null)
-				throw new ArgumentNullException("filepath");
+				throw new ArgumentNullException(nameof(filepath));
 			if (String.IsNullOrWhiteSpace(filepath))
-				throw new ArgumentException("Cannot be empty or only whitespace.", "filepath");
+				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
+			Contract.EndContractBlock();
 
 			if (File.Exists(filepath))
 				using (var s = new StreamReader((new FileInfo(filepath)).OpenRead()))

@@ -12,7 +12,7 @@ namespace Open.Text.CSV.Excel
 
 		public static void WriteCsvExcelHyperlink(this TextWriter writer, Uri link, string text = null)
 		{
-			if (link == null) throw new ArgumentNullException("link");
+			if (link == null) throw new ArgumentNullException(nameof(link));
 
 			writer.WriteCsvExcelHyperlink(link.ToString(), text);
 		}
@@ -29,7 +29,7 @@ namespace Open.Text.CSV.Excel
 
 		public static void WriteExcelHyperlink(this CsvWriter writer, Uri link, string text = null)
 		{
-			if (link == null) throw new ArgumentNullException("link");
+			if (link == null) throw new ArgumentNullException(nameof(link));
 
 			WriteExcelHyperlink(writer, link.ToString(), text);
 		}

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
 
 namespace Open.Text.CSV
 {
@@ -9,7 +9,7 @@ namespace Open.Text.CSV
 	{
 		public CsvRow(string[] headerRow)
 		{
-			_headerRow = headerRow ?? throw new ArgumentNullException("headerRow");
+			_headerRow = headerRow ?? throw new ArgumentNullException(nameof(headerRow));
 		}
 
 		string[] _headerRow;
@@ -18,10 +18,12 @@ namespace Open.Text.CSV
 
 		public string[] GetRow(IDictionary<string, object> values)
 		{
-			if(values==null) throw new ArgumentNullException("values");
+			if (values == null) throw new ArgumentNullException(nameof(values));
+			Contract.EndContractBlock();
+
 			return _headerRow
 				.Select(key => values.TryGetValue(key, out object value) ? CsvUtility.ExportValue(value) : null)
 				.ToArray();
 		}
-    }
+	}
 }

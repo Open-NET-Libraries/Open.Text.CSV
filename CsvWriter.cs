@@ -1,6 +1,7 @@
 ﻿using Open.Disposable;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
@@ -37,7 +38,8 @@ namespace Open.Text.CSV
 
 		public static void WriteRow(TextWriter writer, object[] row, bool forceQuotes = false)
 		{
-			if (row == null) throw new ArgumentNullException("row");
+			if (row == null) throw new ArgumentNullException(nameof(row));
+			Contract.EndContractBlock();
 
 			foreach (var o in row)
 				WriteValue(writer, o, forceQuotes);
@@ -47,7 +49,8 @@ namespace Open.Text.CSV
 
 		public static void WriteRows(TextWriter writer, object[][] rows, bool forceQuotes = false)
 		{
-			if (rows == null) throw new ArgumentNullException("rows");
+			if (rows == null) throw new ArgumentNullException(nameof(rows));
+			Contract.EndContractBlock();
 
 			foreach (var row in rows)
 				WriteRow(writer, row, forceQuotes);
