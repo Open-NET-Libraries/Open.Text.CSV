@@ -22,7 +22,7 @@ namespace Open.Text.CSV
 			Contract.EndContractBlock();
 
 			return _headerRow
-				.Select(key => values.TryGetValue(key, out object value) ? CsvUtility.ExportValue(value) : null)
+				.Select(key => values.TryGetValue(key, out var value) ? CsvUtility.ExportValue(value) : null)
 				.ToArray();
 		}
 	}

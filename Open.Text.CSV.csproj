@@ -22,6 +22,14 @@ Part of the "Open" set of libraries.</Description>
     <PackageReleaseNotes>Updated to .NET Standard for compatability.</PackageReleaseNotes>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="CsvData.cs" />
     <Compile Remove="Web.cs" />

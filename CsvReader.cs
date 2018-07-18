@@ -30,7 +30,7 @@ namespace Open.Text.CSV
 
 		public string[][] ReadRows()
 		{
-			var rows = GetRows(_source, out int maxColumns);
+			var rows = GetRows(_source, out var maxColumns);
 			if (maxColumns > _maxColumns) _maxColumns = maxColumns;
 			return rows;
 		}
@@ -53,7 +53,7 @@ namespace Open.Text.CSV
 
 		public static string[] GetRow(StreamReader source, ref int maxColumns)
 		{
-			TryGetRow(source, out string[] row, ref maxColumns);
+			TryGetRow(source, out var row, ref maxColumns);
 			return row;
 		}
 
@@ -65,7 +65,7 @@ namespace Open.Text.CSV
 
 			maxColumns = 0;
 			var lines = new List<string[]>();
-			while (TryGetRow(source, out string[] row, ref maxColumns))
+			while (TryGetRow(source, out var row, ref maxColumns))
 				lines.Add(row);
 
 			return lines.ToArray();
@@ -75,7 +75,7 @@ namespace Open.Text.CSV
 		{
 			if (filepath == null)
 				throw new ArgumentNullException(nameof(filepath));
-			if (String.IsNullOrWhiteSpace(filepath))
+			if (string.IsNullOrWhiteSpace(filepath))
 				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
 			Contract.EndContractBlock();
 

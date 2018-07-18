@@ -19,7 +19,7 @@ namespace Open.Text.CSV.Excel
 
 		public static void WriteCsvExcelHyperlink(this TextWriter writer, string link, string text = null)
 		{
-			WriteCsvExcelValue(writer, "=HYPERLINK(" + CsvUtility.WrapQuotes(link) + (text == null ? String.Empty : ("," + CsvUtility.WrapQuotes(text))) + ")");
+			WriteCsvExcelValue(writer, "=HYPERLINK(" + CsvUtility.WrapQuotes(link) + (text == null ? string.Empty : ("," + CsvUtility.WrapQuotes(text))) + ")");
 		}
 
 		public static void WriteExcelValue(this CsvWriter writer, string value)
