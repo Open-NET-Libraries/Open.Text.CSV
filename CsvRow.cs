@@ -12,7 +12,7 @@ namespace Open.Text.CSV
 			_headerRow = headerRow ?? throw new ArgumentNullException(nameof(headerRow));
 		}
 
-		string[] _headerRow;
+		readonly string[] _headerRow;
 
 		public string[] HeaderRow => _headerRow.ToArray();
 

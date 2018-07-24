@@ -43,7 +43,7 @@ Part of the "Open" set of libraries.</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Open.Disposable" Version="1.1.0" />
+    <PackageReference Include="Open.Disposable" Version="1.2.1" />
     <PackageReference Include="Open.Text" Version="1.1.0" />
   </ItemGroup>
 

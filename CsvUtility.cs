@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Open.Text.CSV
 {
-	public static partial class CsvUtility
+	public static class CsvUtility
 	{
 		public const string LINE_PATTERN = "((?:\")([^\"]+)(?:\")|([^,\"]+))(?:\\s*)(?:,|$)";
 		public static readonly Regex LinePattern = new Regex(LINE_PATTERN);
@@ -33,6 +34,7 @@ namespace Open.Text.CSV
 			var lines = csv == null ? new string[0] : csv.Split('\n');
 
 			var result = new List<string[]>(lines.Length);
+			// ReSharper disable once LoopCanBeConvertedToQuery
 			foreach (var line in lines)
 				result.Add(GetLine(line, ref maxColumns));
 
@@ -41,12 +43,12 @@ namespace Open.Text.CSV
 
 		public static string[][] GetArray(string csv)
 		{
-			return GetArray(csv, out var maxColumns);
+			return GetArray(csv, out _);
 		}
 
 
 		public const string NEWLINE = "\r\n";
-		public readonly static Regex QUOTESNEEDED = new Regex("^\\s+|[,\n]|\\s+$");
+		public static readonly Regex QUOTESNEEDED = new Regex("^\\s+|[,\n]|\\s+$");
 
 		public static string WrapQuotes(string value)
 		{
@@ -70,17 +72,20 @@ namespace Open.Text.CSV
 		public static string ExportValue(object value, bool forceQuotes = false)
 		{
 			var result = string.Empty;
-			if (value != null)// && value != DBNull.Value)
+			switch (value)
 			{
-				if (value is DateTime datetime)
-				{
+				case null:
+					return FormatValue(result, forceQuotes) + ",";
+				case DateTime datetime:
 					result = datetime.TimeOfDay == TimeSpan.Zero ?
 						datetime.ToString("d") : // Use short date.
-						datetime.ToString();
-				}
-				else
+						datetime.ToString(CultureInfo.InvariantCulture);
+					break;
+				default:
 					result = value.ToString();
+					break;
 			}
+
 			return FormatValue(result, forceQuotes) + ",";
 		}
 
