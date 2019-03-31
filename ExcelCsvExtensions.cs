@@ -7,7 +7,7 @@ namespace Open.Text.CSV.Excel
 	{
 		public static void WriteCsvExcelValue(this TextWriter writer, string value)
 		{
-			CsvWriter.WriteValue(writer, "=" + CsvUtility.WrapQuotes(value));
+			CsvWriter.WriteValue(writer, '=' + CsvUtility.WrapQuotes(value));
 		}
 
 		public static void WriteCsvExcelHyperlink(this TextWriter writer, Uri link, string text = null)
@@ -19,12 +19,12 @@ namespace Open.Text.CSV.Excel
 
 		public static void WriteCsvExcelHyperlink(this TextWriter writer, string link, string text = null)
 		{
-			WriteCsvExcelValue(writer, "=HYPERLINK(" + CsvUtility.WrapQuotes(link) + (text == null ? string.Empty : ("," + CsvUtility.WrapQuotes(text))) + ")");
+			WriteCsvExcelValue(writer, $"=HYPERLINK({CsvUtility.WrapQuotes(link)}{(text == null ? string.Empty : (',' + CsvUtility.WrapQuotes(text)))})");
 		}
 
 		public static void WriteExcelValue(this CsvWriter writer, string value)
 		{
-			CsvWriter.WriteValue(writer.Target, "=" + CsvUtility.WrapQuotes(value));
+			CsvWriter.WriteValue(writer.Target, '=' + CsvUtility.WrapQuotes(value));
 		}
 
 		public static void WriteExcelHyperlink(this CsvWriter writer, Uri link, string text = null)

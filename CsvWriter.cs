@@ -1,5 +1,6 @@
 ﻿using Open.Disposable;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 
@@ -19,12 +20,12 @@ namespace Open.Text.CSV
 			Target = null; // The intention here is if this object is disposed, then prevent further writing.
 		}
 
-		public void WriteRow(object[] row, bool forceQuotes = false)
+		public void WriteRow<T>(IEnumerable<T> row, bool forceQuotes = false)
 		{
 			WriteRow(Target, row, forceQuotes);
 		}
 
-		public void WriteRows(object[][] rows, bool forceQuotes = false)
+		public void WriteRows<T>(IEnumerable<IEnumerable<T>> rows, bool forceQuotes = false)
 		{
 			WriteRows(Target, rows, forceQuotes);
 		}
@@ -34,7 +35,7 @@ namespace Open.Text.CSV
 			writer.Write(CsvUtility.ExportValue(value, forceQuotes));
 		}
 
-		public static void WriteRow(TextWriter writer, object[] row, bool forceQuotes = false)
+		public static void WriteRow<T>(TextWriter writer, IEnumerable<T> row, bool forceQuotes = false)
 		{
 			if (row == null) throw new ArgumentNullException(nameof(row));
 			Contract.EndContractBlock();
@@ -45,7 +46,7 @@ namespace Open.Text.CSV
 			writer.WriteLineNoTabs();
 		}
 
-		public static void WriteRows(TextWriter writer, object[][] rows, bool forceQuotes = false)
+		public static void WriteRows<T>(TextWriter writer, IEnumerable<IEnumerable<T>> rows, bool forceQuotes = false)
 		{
 			if (rows == null) throw new ArgumentNullException(nameof(rows));
 			Contract.EndContractBlock();

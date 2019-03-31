@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Open.Text.CSV
 {
@@ -10,32 +11,35 @@ namespace Open.Text.CSV
 	{
 		public CsvReader(StreamReader source)
 		{
-			_source = source;
+			_source = source ?? throw new ArgumentNullException(nameof(source));
 		}
 
 		StreamReader _source;
 
-		int _maxColumns;
-		public int MaxColumns => _maxColumns;
 
 		protected override void OnDispose(bool calledExplicitly)
 		{
 			_source = null; // The intention here is if this object is disposed, then prevent further reading.
 		}
 
-		public string[] ReadRow()
+		public IEnumerable<string> ReadNextRow()
+			=> GetNextRow(_source);
+
+		public ValueTask<IEnumerable<string>> ReadNextRowAsync()
+			=> GetNextRowAsync(_source);
+
+		public IEnumerable<IEnumerable<string>> ReadRows()
 		{
-			return GetRow(_source, ref _maxColumns);
+			var s = _source;
+			if (s == null)
+				throw new ObjectDisposedException(GetType().ToString());
+			Contract.EndContractBlock();
+
+			while (TryGetNextRow(s, out var row))
+				yield return row;
 		}
 
-		public string[][] ReadRows()
-		{
-			var rows = GetRows(_source, out var maxColumns);
-			if (maxColumns > _maxColumns) _maxColumns = maxColumns;
-			return rows;
-		}
-
-		public static bool TryGetRow(StreamReader source, out string[] row, ref int maxColumns)
+		public static bool TryGetNextRow(StreamReader source, out IEnumerable<string> row)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
@@ -43,7 +47,7 @@ namespace Open.Text.CSV
 
 			if (!source.EndOfStream)
 			{
-				row = CsvUtility.GetLine(source.ReadLine(), ref maxColumns);
+				row = CsvUtility.GetLine(source.ReadLine());
 				return true;
 			}
 
@@ -51,27 +55,38 @@ namespace Open.Text.CSV
 			return false;
 		}
 
-		public static string[] GetRow(StreamReader source, ref int maxColumns)
-		{
-			TryGetRow(source, out var row, ref maxColumns);
-			return row;
-		}
-
-		public static string[][] GetRows(StreamReader source, out int maxColumns)
+		public static ValueTask<IEnumerable<string>> GetNextRowAsync(StreamReader source)
 		{
 			if (source == null)
 				throw new ArgumentNullException(nameof(source));
 			Contract.EndContractBlock();
 
-			maxColumns = 0;
-			var lines = new List<string[]>();
-			while (TryGetRow(source, out var row, ref maxColumns))
-				lines.Add(row);
+			if (source.EndOfStream)
+				return new ValueTask<IEnumerable<string>>(default(IEnumerable<string>));
 
-			return lines.ToArray();
+			return GetNextRowAsyncCore(source);
 		}
 
-		public static string[][] GetRowsFromFile(string filepath, out int maxColumns)
+		static async ValueTask<IEnumerable<string>> GetNextRowAsyncCore(StreamReader source)
+			=> source.EndOfStream ? null : CsvUtility.GetLine(await source.ReadLineAsync());
+
+		public static IEnumerable<string> GetNextRow(StreamReader source)
+		{
+			TryGetNextRow(source, out var row);
+			return row;
+		}
+
+		public static IEnumerable<IEnumerable<string>> GetRows(StreamReader source)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+			Contract.EndContractBlock();
+
+			while (TryGetNextRow(source, out var row))
+				yield return row;
+		}
+
+		public static IEnumerable<IEnumerable<string>> GetRowsFromFile(string filepath)
 		{
 			if (filepath == null)
 				throw new ArgumentNullException(nameof(filepath));
@@ -80,11 +95,11 @@ namespace Open.Text.CSV
 			Contract.EndContractBlock();
 
 			if (File.Exists(filepath))
+			{
 				using (var s = new StreamReader((new FileInfo(filepath)).OpenRead()))
-					return GetRows(s, out maxColumns);
-
-			maxColumns = 0;
-			return new string[0][];
+					foreach (var line in GetRows(s))
+						yield return line;
+			}
 		}
 	}
 }
