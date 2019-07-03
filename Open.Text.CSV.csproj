@@ -16,9 +16,9 @@ Part of the "Open" set of libraries.</Description>
     <RepositoryUrl>https://github.com/electricessence/Open.Text.CSV/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-    <Version>2.0.1</Version>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <Version>2.1.0</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
@@ -42,14 +42,13 @@ Part of the "Open" set of libraries.</Description>
     <None Remove="LICENSE" />
     <None Remove="README.md" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Open.Disposable" Version="2.0.1" />
-    <PackageReference Include="Open.Text" Version="2.0.5" />
-  </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Open.Text" Version="2.0.5" />
   </ItemGroup>
 
 </Project>

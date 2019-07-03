@@ -1,5 +1,4 @@
-﻿using Open.Disposable;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Open.Text.CSV
 {
-	public class CsvReader : DisposableBase
+	public class CsvReader : IDisposable
 	{
 		public CsvReader(StreamReader source)
 		{
@@ -17,7 +16,7 @@ namespace Open.Text.CSV
 		StreamReader _source;
 
 
-		protected override void OnDispose(bool calledExplicitly)
+		public void Dispose()
 		{
 			_source = null; // The intention here is if this object is disposed, then prevent further reading.
 		}
@@ -96,7 +95,7 @@ namespace Open.Text.CSV
 
 			if (File.Exists(filepath))
 			{
-				using (var s = new StreamReader((new FileInfo(filepath)).OpenRead()))
+				using (var s = new StreamReader(new FileInfo(filepath).OpenRead()))
 					foreach (var line in GetRows(s))
 						yield return line;
 			}
