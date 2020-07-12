@@ -61,15 +61,18 @@ namespace Open.Text.CSV
 
 		public static string WrapQuotes(string value)
 		{
-			if (value == null)
+			if (value is null)
 				return string.Empty;
-
+#if NETSTANDARD2_1
+			return '"' + value.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
+#else
 			return '"' + value.Replace("\"", "\"\"") + '"';
+#endif
 		}
 
 		public static string FormatValue(string value, bool forceQuotes = false)
 		{
-			if (value == null)
+			if (value is null)
 				return string.Empty;
 
 			if (!string.IsNullOrEmpty(value) && forceQuotes || QUOTESNEEDED.IsMatch(value))
@@ -78,25 +81,14 @@ namespace Open.Text.CSV
 			return value;
 		}
 
-		public static string ExportValue(object value, bool forceQuotes = false)
-		{
-			var result = string.Empty;
-			switch (value)
+		public static string ExportValue(object? value, bool forceQuotes = false)
+			=> FormatValue(value switch
 			{
-				case null:
-					return FormatValue(result, forceQuotes) + ",";
-				case DateTime datetime:
-					result = datetime.TimeOfDay == TimeSpan.Zero ?
-						datetime.ToString("d") : // Use short date.
-						datetime.ToString(CultureInfo.InvariantCulture);
-					break;
-				default:
-					result = value.ToString();
-					break;
-			}
-
-			return FormatValue(result, forceQuotes) + ",";
-		}
+				DateTime datetime => datetime.TimeOfDay == TimeSpan.Zero ?
+					datetime.ToString("d", CultureInfo.InvariantCulture) : // Use short date.
+					datetime.ToString(CultureInfo.InvariantCulture),
+				_ => value is null ? string.Empty : value.ToString(),
+			}, forceQuotes) + ",";
 
 	}
 }

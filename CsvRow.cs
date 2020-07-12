@@ -15,9 +15,9 @@ namespace Open.Text.CSV
 
 		public ReadOnlySpan<string> HeaderRow => _headerRow.Span;
 
-		public IEnumerable<string> GetRow(IDictionary<string, object> values)
+		public IEnumerable<string?> GetRow(IDictionary<string, object> values)
 		{
-			if (values == null) throw new ArgumentNullException(nameof(values));
+			if (values is null) throw new ArgumentNullException(nameof(values));
 			Contract.EndContractBlock();
 
 			var len = _headerRow.Length;

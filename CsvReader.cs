@@ -13,8 +13,8 @@ namespace Open.Text.CSV
 			_source = source ?? throw new ArgumentNullException(nameof(source));
 		}
 
-		StreamReader _source;
-
+		StreamReader? _source;
+		StreamReader Source => _source ?? throw new ObjectDisposedException(GetType().ToString());
 
 		public void Dispose()
 		{
@@ -22,15 +22,15 @@ namespace Open.Text.CSV
 		}
 
 		public IEnumerable<string> ReadNextRow()
-			=> GetNextRow(_source);
+			=> GetNextRow(Source);
 
-		public ValueTask<IEnumerable<string>> ReadNextRowAsync()
-			=> GetNextRowAsync(_source);
+		public ValueTask<IEnumerable<string>?> ReadNextRowAsync()
+			=> GetNextRowAsync(Source);
 
 		public IEnumerable<IEnumerable<string>> ReadRows()
 		{
 			var s = _source;
-			if (s == null)
+			if (s is null)
 				throw new ObjectDisposedException(GetType().ToString());
 			Contract.EndContractBlock();
 
@@ -40,7 +40,7 @@ namespace Open.Text.CSV
 
 		public static bool TryGetNextRow(StreamReader source, out IEnumerable<string> row)
 		{
-			if (source == null)
+			if (source is null)
 				throw new ArgumentNullException(nameof(source));
 			Contract.EndContractBlock();
 
@@ -50,24 +50,24 @@ namespace Open.Text.CSV
 				return true;
 			}
 
-			row = null;
+			row = null!;
 			return false;
 		}
 
-		public static ValueTask<IEnumerable<string>> GetNextRowAsync(StreamReader source)
+		public static ValueTask<IEnumerable<string>?> GetNextRowAsync(StreamReader source)
 		{
-			if (source == null)
+			if (source is null)
 				throw new ArgumentNullException(nameof(source));
 			Contract.EndContractBlock();
 
 			if (source.EndOfStream)
-				return new ValueTask<IEnumerable<string>>(default(IEnumerable<string>));
+				return new ValueTask<IEnumerable<string>?>(default(IEnumerable<string>));
 
 			return GetNextRowAsyncCore(source);
 		}
 
-		static async ValueTask<IEnumerable<string>> GetNextRowAsyncCore(StreamReader source)
-			=> source.EndOfStream ? null : CsvUtility.GetLine(await source.ReadLineAsync());
+		static async ValueTask<IEnumerable<string>?> GetNextRowAsyncCore(StreamReader source)
+			=> source.EndOfStream ? null : CsvUtility.GetLine(await source.ReadLineAsync().ConfigureAwait(false));
 
 		public static IEnumerable<string> GetNextRow(StreamReader source)
 		{
@@ -77,7 +77,7 @@ namespace Open.Text.CSV
 
 		public static IEnumerable<IEnumerable<string>> GetRows(StreamReader source)
 		{
-			if (source == null)
+			if (source is null)
 				throw new ArgumentNullException(nameof(source));
 			Contract.EndContractBlock();
 
@@ -87,18 +87,16 @@ namespace Open.Text.CSV
 
 		public static IEnumerable<IEnumerable<string>> GetRowsFromFile(string filepath)
 		{
-			if (filepath == null)
+			if (filepath is null)
 				throw new ArgumentNullException(nameof(filepath));
 			if (string.IsNullOrWhiteSpace(filepath))
 				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
 			Contract.EndContractBlock();
 
-			if (File.Exists(filepath))
-			{
-				using (var s = new StreamReader(new FileInfo(filepath).OpenRead()))
-					foreach (var line in GetRows(s))
-						yield return line;
-			}
+			if (!File.Exists(filepath)) yield break;
+			using var s = new StreamReader(new FileInfo(filepath).OpenRead());
+			foreach (var line in GetRows(s))
+				yield return line;
 		}
 	}
 }
