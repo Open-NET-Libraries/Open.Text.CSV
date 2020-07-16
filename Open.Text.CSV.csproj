@@ -10,12 +10,12 @@
 
 Part of the "Open" set of libraries.
 </Description>
-    <Copyright>https://github.com/Open-NET-Libraries/Open.Text.CSV/blob/master/LISCENSE.md</Copyright>
-    <PackageProjectUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</PackageProjectUrl>
+		<Copyright>© electricessence (Oren F.) All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -47,7 +47,7 @@ Part of the "Open" set of libraries.
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Open.Text" Version="2.3.1" />
+    <PackageReference Include="Open.Text" Version="2.3.2" />
 		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
