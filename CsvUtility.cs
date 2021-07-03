@@ -9,7 +9,7 @@ namespace Open.Text.CSV
 	public static class CsvUtility
 	{
 		public const string LINE_PATTERN = "((?:\")([^\"]+)(?:\")|([^,\"]+))(?:\\s*)(?:,|$)";
-		public static readonly Regex LinePattern = new Regex(LINE_PATTERN);
+		public static readonly Regex LinePattern = new(LINE_PATTERN);
 
 		public static IEnumerable<string> GetLine(string line)
 			=> string.IsNullOrEmpty(line)
@@ -57,7 +57,7 @@ namespace Open.Text.CSV
 		}
 
 		public const string NEWLINE = "\r\n";
-		public static readonly Regex QUOTESNEEDED = new Regex("^\\s+|[,\n]|\\s+$");
+		public static readonly Regex QUOTESNEEDED = new("^\\s+|[,\n]|\\s+$");
 
 		public static string WrapQuotes(string value)
 		{
