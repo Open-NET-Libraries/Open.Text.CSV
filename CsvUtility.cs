@@ -8,7 +8,7 @@ namespace Open.Text.CSV
 {
 	public static class CsvUtility
 	{
-		public const string LINE_PATTERN = "((?:\")([^\"]+)(?:\")|([^,\"]+))(?:\\s*)(?:,|$)";
+		public const string LINE_PATTERN = "((?:\")([^\"]*)(?:\")|([^,\"$]*))(?:\\s*)(?:,|$)";
 		public static readonly Regex LinePattern = new(LINE_PATTERN);
 
 		public static IEnumerable<string> GetLine(string line)
@@ -19,7 +19,7 @@ namespace Open.Text.CSV
 		static IEnumerable<string> GetLineCore(string line)
 		{
 			var mc = LinePattern.Matches(line);
-			var c = mc.Count;
+			var c = mc.Count-1;
 
 			for (var i = 0; i < c; i++)
 				yield return mc[i].Groups[1].Value.Trim('"');
