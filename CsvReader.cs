@@ -85,6 +85,42 @@ namespace Open.Text.CSV
 				yield return row;
 		}
 
+#if NETSTANDARD2_1_OR_GREATER
+		public static async IAsyncEnumerable<IEnumerable<string>> GetRowsAsync(StreamReader source)
+		{
+			if (source is null)
+				throw new ArgumentNullException(nameof(source));
+			Contract.EndContractBlock();
+
+			if (source.EndOfStream) yield break;
+			var last = source.ReadLineAsync().ConfigureAwait(false);
+
+			while(!source.EndOfStream)
+			{
+				var next = source.ReadLineAsync().ConfigureAwait(false);
+				yield return CsvUtility.GetLine(await last);
+				last = next;
+			}
+
+			yield return CsvUtility.GetLine(await last);
+		}
+
+		public static async IAsyncEnumerable<IEnumerable<string>> GetRowsFromFileAsync(string filepath)
+		{
+			if (filepath is null)
+				throw new ArgumentNullException(nameof(filepath));
+			if (string.IsNullOrWhiteSpace(filepath))
+				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
+			Contract.EndContractBlock();
+
+			if (!File.Exists(filepath)) yield break;
+			using var fs = new FileInfo(filepath).OpenRead();
+			using var sr = new StreamReader(fs);
+			await foreach (var line in GetRowsAsync(sr))
+				yield return line;
+		}
+#endif
+
 		public static IEnumerable<IEnumerable<string>> GetRowsFromFile(string filepath)
 		{
 			if (filepath is null)
@@ -94,8 +130,9 @@ namespace Open.Text.CSV
 			Contract.EndContractBlock();
 
 			if (!File.Exists(filepath)) yield break;
-			using var s = new StreamReader(new FileInfo(filepath).OpenRead());
-			foreach (var line in GetRows(s))
+			using var fs = new FileInfo(filepath).OpenRead();
+			using var sr = new StreamReader(fs);
+			foreach (var line in GetRows(sr))
 				yield return line;
 		}
 	}
