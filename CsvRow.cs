@@ -21,7 +21,7 @@ namespace Open.Text.CSV
 			Contract.EndContractBlock();
 
 			var len = _headerRow.Length;
-			var header = _headerRow.ToArray();
+			var header = _headerRow.Span;
 
 			for (var i = 0; i < len; i++)
 			{
