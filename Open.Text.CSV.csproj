@@ -1,54 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>electricessence</Authors>
-    <Description>A set of utilities for reading and writing CSV data. 
+		<Description>A set of utilities for reading and writing CSV data.
 
 Part of the "Open" set of libraries.
-</Description>
+		</Description>
 		<Copyright>© electricessence (Oren F.) All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-    <Version>2.4.0</Version>
-    <PackageReleaseNotes></PackageReleaseNotes>
+		<RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
+		<Version>2.4.0</Version>
+		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageIcon>logo.png</PackageIcon>
-  </PropertyGroup>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="CsvData.cs" />
-    <Compile Remove="Web.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="CsvData.cs" />
+		<Compile Remove="Web.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove=".git" />
-    <None Remove=".gitignore" />
+	<ItemGroup>
+		<None Remove=".git" />
+		<None Remove=".gitignore" />
 		<None Include="logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Open.Text" Version="2.3.2" />
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Open.Text" Version="2.3.2" />
 	</ItemGroup>
 
 </Project>

@@ -21,11 +21,10 @@ namespace Open.Text.CSV
 			Contract.EndContractBlock();
 
 			var len = _headerRow.Length;
-			var header = _headerRow.Span;
 
 			for (var i = 0; i < len; i++)
 			{
-				yield return values.TryGetValue(header[i], out var value) ? CsvUtility.ExportValue(value) : null;
+				yield return values.TryGetValue(_headerRow.Span[i], out var value) ? CsvUtility.ExportValue(value) : null;
 			}
 		}
 	}
