@@ -11,3 +11,9 @@ dotnet_diagnostic.CA1816.severity = silent
 
 # CA1303: Do not pass literals as localized parameters
 dotnet_diagnostic.CA1303.severity = silent
+
+# IDE0057: Use range operator
+dotnet_diagnostic.IDE0057.severity = silent
+
+# IDE0056: Use index operator
+dotnet_diagnostic.IDE0056.severity = silent
