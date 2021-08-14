@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Open.Text.CSV\Open.Text.CSV.csproj" />
+    <ProjectReference Include="..\Source\Open.Text.CSV.csproj" />
   </ItemGroup>
 
 </Project>
