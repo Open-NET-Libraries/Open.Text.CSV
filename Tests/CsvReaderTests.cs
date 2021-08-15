@@ -1,10 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Open.Text.CSV.Test
 {
 	public class CsvReaderTests
 	{
+		public CsvReaderTests(ITestOutputHelper output)
+		{
+			Output = output;
+		}
+
 		[Theory]
 		[InlineData("A,B,C, \"D\" ,E", new[] { "A", "B", "C", "D", "E" })]
 		[InlineData("A,B ,C, \"D\" ,E", new[] { "A", "B", "C", "D", "E" })]
@@ -52,6 +63,47 @@ namespace Open.Text.CSV.Test
 				result = csv[1].ToArray();
 				Assert.Equal(new[] { "D", "E", "F" }, result);
 			}
+		}
+
+		const string TEST_DATA_CSV = "TestData.csv";
+
+		readonly ITestOutputHelper Output;
+
+		[Fact]
+		public void FilePerformanceTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var rows = new List<string>();
+			while (!sr.EndOfStream) rows.Add(sr.ReadLine());
+			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public async Task AsyncFilePerformanceTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var rows = new List<string>();
+			while (!sr.EndOfStream) rows.Add(await sr.ReadLineAsync().ConfigureAwait(false));
+			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public void CsvFilePerformanceTest()
+		{
+			var rows = CsvReader.GetRowsFromFile(TEST_DATA_CSV);
+			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public void CsvPerformanceTest()
+		{
+			var source = File.ReadAllText(TEST_DATA_CSV);
+			var sw = Stopwatch.StartNew();
+			var rows = CsvReader.GetRowsFromText(source);
+			Output.WriteLine($"CsvParse Time: {sw.Elapsed.TotalSeconds} seconds");
+			Assert.NotEmpty(rows);
 		}
 	}
 }
