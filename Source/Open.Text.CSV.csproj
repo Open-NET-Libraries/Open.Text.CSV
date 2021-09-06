@@ -7,16 +7,17 @@
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>electricessence</Authors>
-		<Description>A set of utilities for reading and writing CSV data.
+		<Description>
+			A set of utilities for reading and writing CSV data.
 
-Part of the "Open" set of libraries.
+			Part of the "Open" set of libraries.
 		</Description>
 		<Copyright>© electricessence (Oren F.) All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-		<Version>3.0.0</Version>
+		<Version>3.0.1</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -45,10 +46,6 @@ Part of the "Open" set of libraries.
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Open.Text" Version="2.3.3" />
 	</ItemGroup>
 
 </Project>

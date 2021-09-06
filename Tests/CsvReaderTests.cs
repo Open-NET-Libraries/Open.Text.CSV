@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -80,12 +79,25 @@ namespace Open.Text.CSV.Test
 		}
 
 		[Fact]
-		public async Task AsyncFilePerformanceTest()
+		public async Task AsyncFileLinePerformanceTest()
 		{
 			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
 			using var sr = new StreamReader(fs);
 			var rows = new List<string>();
 			while (!sr.EndOfStream) rows.Add(await sr.ReadLineAsync().ConfigureAwait(false));
+			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public async Task PremptiveAsyncFileLinePerformanceTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var rows = new List<string>();
+			await foreach (var line in sr.PreemptiveReadLineAsync())
+			{
+				rows.Add(line);
+			}
 			Assert.NotEmpty(rows);
 		}
 
@@ -104,6 +116,32 @@ namespace Open.Text.CSV.Test
 			var rows = CsvReader.GetRowsFromText(source);
 			Output.WriteLine($"CsvParse Time: {sw.Elapsed.TotalSeconds} seconds");
 			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public async Task SingleBufferTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var i = 0;
+			await foreach (var buffer in sr.SingleBufferReadAsync())
+			{
+				i++;
+			}
+			Assert.True(i != 0);
+		}
+
+		[Fact]
+		public async Task DualBufferTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var i = 0;
+			await foreach (var buffer in sr.DualBufferReadAsync())
+			{
+				i++;
+			}
+			Assert.True(i != 0);
 		}
 	}
 }
