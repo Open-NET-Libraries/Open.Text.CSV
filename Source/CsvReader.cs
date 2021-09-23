@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Open.Text.CSV
 {
@@ -33,7 +34,7 @@ namespace Open.Text.CSV
 			EndOfRow,
 		}
 
-		readonly StringBuilder _fieldBuffer = new();
+		StringBuilder? _fieldBuffer;
 
 		private bool ReadNextRowCore(ref IList<string>? rowBuffer)
 		{
@@ -43,10 +44,12 @@ namespace Open.Text.CSV
 			int c;
 			int len = 0;
 
+			var fb = Interlocked.Exchange(ref _fieldBuffer, null) ?? new StringBuilder();
+
 			void AddChar(int c, bool ws = false)
 			{
-				_fieldBuffer.Append((char)c);
-				if (!ws) len = _fieldBuffer.Length;
+				fb.Append((char)c);
+				if (!ws) len = fb.Length;
 			}
 
 			void AddEntry()
@@ -55,25 +58,29 @@ namespace Open.Text.CSV
 				if (len == 0)
 				{
 					rb.Add(string.Empty);
-					if (_fieldBuffer.Length != 0) _fieldBuffer.Clear();
+					if (fb.Length != 0) fb.Clear();
 					return;
 				}
 
-				if (len < _fieldBuffer.Length) _fieldBuffer.Length = len;
-				rb.Add(_fieldBuffer.ToString());
-				_fieldBuffer.Clear();
+				if (len < fb.Length) fb.Length = len;
+				rb.Add(fb.ToString());
+				fb.Clear();
 				len = 0;
 			}
 
+
 			// Since ReadNextRow will only be done through synchronous methods, this should ensure thread safety.
-			lock (_fieldBuffer)
+
 			{
-				{
-					// Should never be acquired without a clear buffer but an exception may have been trapped and state not reset.
-					var fbEmpty = _fieldBuffer.Length == 0;
-					Debug.Assert(_fieldBuffer.Length == 0);
-					if (!fbEmpty) _fieldBuffer.Clear();
-				}
+				// Should never be acquired without a clear buffer but an exception may have been trapped and state not reset.
+				var fbEmpty = fb.Length == 0;
+				Debug.Assert(fb.Length == 0);
+				if (!fbEmpty) fb.Clear();
+			}
+
+			try
+			{
+
 
 			loop:
 
@@ -90,7 +97,7 @@ namespace Open.Text.CSV
 							break;
 
 						case State.InQuotedField:
-							_fieldBuffer.Clear();
+							fb.Clear();
 							throw new InvalidDataException("When the line ends with a quoted field, the last character should be an unescaped double quote.");
 					}
 
@@ -182,7 +189,7 @@ namespace Open.Text.CSV
 								break;
 
 							default:
-								_fieldBuffer.Clear();
+								fb.Clear();
 								throw new InvalidDataException(CORRUPT_FIELD);
 						}
 						break;
@@ -229,21 +236,33 @@ namespace Open.Text.CSV
 
 				goto loop;
 			}
+			finally
+			{
+				Interlocked.CompareExchange(ref _fieldBuffer, fb, null);
+			}
 		}
 
 		public bool ReadNextRow(IList<string> rowBuffer)
-			=> ReadNextRowCore(ref rowBuffer!);
+		{
+			if (rowBuffer is null)
+				throw new ArgumentNullException(nameof(rowBuffer));
+
+			return ReadNextRowCore(ref rowBuffer!);
+		}
 
 		public IList<string>? ReadNextRow()
 		{
 			IList<string>? list = null;
 			var result = ReadNextRowCore(ref list);
-			Debug.Assert(result == (list != null));
+			Debug.Assert(result == (list is not null));
 			return list;
 		}
 
 		public IEnumerable<IList<string>> ReadRows(IList<string> rowBuffer)
 		{
+			if (rowBuffer is null)
+				throw new ArgumentNullException(nameof(rowBuffer));
+
 			var s = _source;
 			if (s is null) throw new ObjectDisposedException(GetType().ToString());
 			Contract.EndContractBlock();
