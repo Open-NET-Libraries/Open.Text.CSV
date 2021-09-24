@@ -42,7 +42,7 @@ namespace Open.Text.CSV.Test
 				CsvReader.ReadRows("A,B,C\nD,E,F \n")
 			};
 
-			foreach (var csv in csvs.Select(c=>c.ToArray()))
+			foreach (var csv in csvs.Select(c => c.ToArray()))
 			{
 				Assert.Equal(2, csv.Length);
 

@@ -11,18 +11,34 @@ using System.Threading.Tasks;
 
 namespace Open.Text.CSV
 {
-	public class CsvReader : CsvReaderBase
+	public sealed class CsvReader : IDisposable
 	{
 		public const int DEFAULT_BUFFER_SIZE = 4096;
 
-		public CsvReader(TextReader source) : base(source)
+		public CsvReader(TextReader source)
 		{
+			_source = source ?? throw new ArgumentNullException(nameof(source));
+			_rowBuilder = new(SetNextRow);
+		}
+
+		readonly CsvRowBuilder _rowBuilder;
+		List<string>? _nextRow;
+		void SetNextRow(List<string> row) => _nextRow = row;
+
+		TextReader? _source;
+		TextReader Source => _source ?? throw new ObjectDisposedException(GetType().ToString());
+
+		public void Dispose()
+		{
+			_source = null; // The intention here is if this object is disposed, then prevent further reading.
 		}
 
 		ArraySegment<char> _remaining = default;
 
 		public bool EndReached { get; private set; }
 
+		/* 
+		// Slightly sub optimal.
 		public bool TryReadNextRow(out IList<string>? row)
 		{
 			var s = Source;
@@ -46,9 +62,8 @@ namespace Open.Text.CSV
 			}
 
 			goto loop;
-		}
-
-		public IList<string>? ReadNextRowBuffered()
+		} */
+		public IList<string>? ReadNextRow()
 		{
 			var s = Source;
 			if (EndReached) return null;
@@ -68,25 +83,25 @@ namespace Open.Text.CSV
 			{
 				EndReached = true;
 				pool.Return(buffer, true);
-				return RowBuilder.EndRow() ? NextRow : null;
+				return _rowBuilder.EndRow() ? _nextRow : null;
 			}
 			_remaining = new ArraySegment<char>(buffer, 0, c);
 
 		add:
-			if (RowBuilder.Add(in _remaining, out _remaining))
+			if (_rowBuilder.Add(in _remaining, out _remaining))
 			{
 				if (_remaining.Count == 0)
 					pool.Return(buffer, true);
-				return NextRow;
+				return _nextRow;
 			}
 
 			goto loop;
 
 		}
 
-		public bool TryReadNextRowBuffered(out IList<string>? row)
+		public bool TryReadNextRow(out IList<string>? row)
 		{
-			row = ReadNextRowBuffered();
+			row = ReadNextRow();
 			return row is not null;
 		}
 
@@ -110,44 +125,25 @@ namespace Open.Text.CSV
 			{
 				EndReached = true;
 				pool.Return(buffer, true);
-				return RowBuilder.EndRow() ? NextRow : null;
+				return _rowBuilder.EndRow() ? _nextRow : null;
 			}
 			_remaining = new ArraySegment<char>(buffer, 0, c);
 
 		add:
-			if (RowBuilder.Add(in _remaining, out _remaining))
+			if (_rowBuilder.Add(in _remaining, out _remaining))
 			{
 				if (_remaining.Count == 0)
 					pool.Return(buffer, true);
-				return NextRow;
+				return _nextRow;
 			}
 
 			goto loop;
 		}
 
-		public IList<string>? ReadNextRow()
-		{
-			var result = TryReadNextRow(out var list);
-			Debug.Assert(result == (list is not null));
-			return list;
-		}
-
 		public IEnumerable<IList<string>> ReadRows()
 		{
 			while (TryReadNextRow(out var rowBuffer))
-			{
-				Debug.Assert(rowBuffer is not null);
 				yield return rowBuffer!;
-			}
-		}
-
-		public IEnumerable<IList<string>> ReadRowsBuffered()
-		{
-			while (TryReadNextRowBuffered(out var rowBuffer))
-			{
-				Debug.Assert(rowBuffer is not null);
-				yield return rowBuffer!;
-			}
 		}
 
 		public static IList<IList<string>> GetAllRowsFromFile(string filepath)
@@ -161,21 +157,6 @@ namespace Open.Text.CSV
 			using var sr = new FileInfo(filepath).OpenText();
 			var list = new List<IList<string>>();
 			foreach (var row in ReadRows(sr)) list.Add(row);
-			return list;
-		}
-
-		public static IList<IList<string>> GetAllRowsFromFileBuffered(string filepath)
-		{
-			if (filepath is null)
-				throw new ArgumentNullException(nameof(filepath));
-			if (string.IsNullOrWhiteSpace(filepath))
-				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
-			Contract.EndContractBlock();
-
-			using var sr = new FileInfo(filepath).OpenText();
-			using var csv = new CsvReader(sr);
-			var list = new List<IList<string>>();
-			foreach (var row in csv.ReadRowsBuffered()) list.Add(row);
 			return list;
 		}
 
@@ -240,7 +221,7 @@ namespace Open.Text.CSV
 			var pool = ArrayPool<char>.Shared;
 			var cNext = pool.Rent(charBufferSize);
 			var cCurrent = pool.Rent(charBufferSize);
-
+			await Task.Yield();
 			try
 			{
 #if NETSTANDARD2_1_OR_GREATER
@@ -296,8 +277,8 @@ namespace Open.Text.CSV
 
 		static Channel<IList<string>> CreateRowBuffer(int maxRows)
 		{
-			if (maxRows ==0) throw new ArgumentException("Cannot be zero.", nameof(maxRows));
-			if (maxRows<-1) throw new ArgumentOutOfRangeException(nameof(maxRows), maxRows, "Cannot be less than -1.");
+			if (maxRows == 0) throw new ArgumentException("Cannot be zero.", nameof(maxRows));
+			if (maxRows < -1) throw new ArgumentOutOfRangeException(nameof(maxRows), maxRows, "Cannot be less than -1.");
 			return maxRows == -1
 				? Channel.CreateUnbounded<IList<string>>(new UnboundedChannelOptions()
 				{

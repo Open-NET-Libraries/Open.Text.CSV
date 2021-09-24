@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Open.Text.CSV
 {
+	/// <summary>
+	/// Receives characters in a CSV sequence and translates them into values in a row.
+	/// </summary>
 	public class CsvRowBuilder
 	{
 		const string CORRUPT_FIELD = "Corrupt field found. A double quote is not escaped or there is extra data after a quoted field.";
@@ -24,6 +27,22 @@ namespace Open.Text.CSV
 			_rowHandler = rowHandler ?? throw new ArgumentNullException(nameof(rowHandler));
 		}
 
+		/// <summary>
+		/// Resets the row builder to the beginning of a row.
+		/// </summary>
+		public void Reset()
+		{
+			_fields = null;
+			_fb.Clear();
+			_state = State.BeforeField;
+			_fieldLen = 0;
+		}
+
+		/// <summary>
+		/// Attempts to finalize a row.
+		/// </summary>
+		/// <returns>true if a new row is emitted; otherwise false.</returns>
+		/// <exception cref="InvalidDataException">If called in the middle of a quoted field.</exception>
 		public bool EndRow()
 		{
 			switch (_state)
@@ -41,27 +60,8 @@ namespace Open.Text.CSV
 			return Complete();
 		}
 
-		private bool Complete()
+		private bool AddChar(in char c)
 		{
-			_state = State.BeforeField;
-			_fb.Clear();
-
-			var f = _fields;
-			if (f is null) return false;
-			_fields = null;
-
-			var count = f.Count;
-			if (count == 0) return false;
-			if (count > _maxFields) _maxFields = count;
-
-			_rowHandler(f);
-			return true;
-		}
-
-		public bool AddChar(int c)
-		{
-			if (c == -1) return EndRow();
-
 			switch (_state)
 			{
 				case State.BeforeField:
@@ -193,16 +193,30 @@ namespace Open.Text.CSV
 			return Complete();
 		}
 
+		/// <summary>
+		/// Takes all the characters in an ArraySegment and attemtps to add them to the row.
+		/// </summary>
+		/// <param name="chars">The characters to attempt to add.</param>
+		/// <param name="remaining">
+		/// The remaining characters after adding.
+		/// If there are not enough to complete a row, an empty segment is returned.
+		/// </param>
+		/// <returns>true if a new row is emitted; otherwise false.</returns>
 		public bool Add(in ArraySegment<char> chars, out ArraySegment<char> remaining)
 		{
 			var a = chars.Array;
-			var end = chars.Offset + chars.Count;
-			for (var i = chars.Offset; i < end; i++)
+			var len = chars.Count;
+			var offset = chars.Offset;
+			var end = offset + len;
+			var span = chars.AsSpan();
+
+			for (var i = 0; i < len; i++)
 			{
-				if (AddChar(a[i]))
+				ref readonly char c = ref span[i];
+				if (AddChar(in c))
 				{
-					var n = i + 1;
-					remaining = n == end ? default : new ArraySegment<char>(a, n, end-n);
+					var n = offset + i + 1;
+					remaining = n == end ? default : new ArraySegment<char>(a, n, end - n);
 					return true;
 				}
 			}
@@ -211,12 +225,17 @@ namespace Open.Text.CSV
 			return false;
 		}
 
+		/// <summary>
+		/// Takes all the characters in an ReadOnlySpan and attemtps to add them to the row.
+		/// </summary>
+		/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
 		public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining)
 		{
 			var len = chars.Length;
 			for (var i = 0; i < len; i++)
 			{
-				if (AddChar(chars[i]))
+				ref readonly char c = ref chars[i];
+				if (AddChar(in c))
 				{
 					var n = i + 1;
 					remaining = n == chars.Length ? ReadOnlySpan<char>.Empty : chars.Slice(n);
@@ -228,13 +247,18 @@ namespace Open.Text.CSV
 			return false;
 		}
 
+		/// <summary>
+		/// Takes all the characters in an ReadOnlyMemory and attemtps to add them to the row.
+		/// </summary>
+		/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
 		public bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining)
 		{
 			var len = chars.Length;
 			var span = chars.Span;
 			for (var i = 0; i < len; i++)
 			{
-				if (AddChar(span[i]))
+				ref readonly char c = ref span[i];
+				if (AddChar(in c))
 				{
 					var n = i + 1;
 					remaining = n == chars.Length ? ReadOnlyMemory<char>.Empty : chars.Slice(n);
@@ -246,12 +270,16 @@ namespace Open.Text.CSV
 			return false;
 		}
 
+		/// <summary>
+		/// Takes all the characters in a string and attemtps to add them to the row.
+		/// </summary>
+		/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
 		public bool Add(string chars, out ReadOnlySpan<char> remaining)
 			=> Add(chars.AsSpan(), out remaining);
 
-		void AddNextChar(in int c, bool ws = false)
+		void AddNextChar(in char c, bool ws = false)
 		{
-			_fb.Append((char)c);
+			_fb.Append(c);
 			if (!ws) _fieldLen = _fb.Length;
 		}
 
@@ -269,6 +297,20 @@ namespace Open.Text.CSV
 			_fields.Add(_fb.ToString());
 			_fb.Clear();
 			_fieldLen = 0;
+		}
+
+		private bool Complete()
+		{
+			var f = _fields;
+			Reset();
+			if (f is null) return false;
+
+			var count = f.Count;
+			if (count == 0) return false;
+			if (count > _maxFields) _maxFields = count;
+
+			_rowHandler(f);
+			return true;
 		}
 
 		enum State

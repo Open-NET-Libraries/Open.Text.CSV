@@ -24,14 +24,14 @@ namespace Open.Text.CSV.Test
 			Assert.Equal("F", row[2]);
 
 			rb.Add("G, H, I", out _);
-			rb.AddChar(-1);
+			rb.EndRow();
 			Assert.Equal(3, rows.Count);
 			row = rows[2];
 			Assert.Equal(3, row.Count);
 			Assert.Equal("I", row[2]);
 
 			rb.Add("J, K, \"L\nX\"", out _);
-			rb.AddChar(-1);
+			rb.EndRow();
 			Assert.Equal(4, rows.Count);
 			row = rows[3];
 			Assert.Equal(3, row.Count);

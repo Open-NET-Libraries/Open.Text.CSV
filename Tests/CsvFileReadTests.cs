@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using BenchmarkDotNet.Attributes;
+using Open.ChannelExtensions;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Open.ChannelExtensions;
-using System.Linq;
-using BenchmarkDotNet.Attributes;
 
 namespace Open.Text.CSV.Test
 {
-	[MemoryDiagnoser]
+	//[MemoryDiagnoser]
 	public class CsvFileReadTests
 	{
 		static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
@@ -27,22 +27,11 @@ namespace Open.Text.CSV.Test
 			Assert.Equal(ExpectedLineCount, rows.Count);
 		}
 
-		[Fact]
-		[Benchmark]
-		public void GetAllRowsFromFileBuffered()
-		{
-			var rows = CsvReader.GetAllRowsFromFileBuffered(TEST_DATA_CSV);
-			Assert.Equal(ExpectedLineCount, rows.Count);
-		}
-
 		[Benchmark]
 		public async Task<IList<IList<string>>> GetAllRowsFromFileAsync()
-		{
-			return await CsvReader.GetAllRowsFromFileAsync(TEST_DATA_CSV);
-		}
+			=> await CsvReader.GetAllRowsFromFileAsync(TEST_DATA_CSV);
 
 		[Fact]
-		[Benchmark]
 		public async Task GetAllRowsFromFileAsyncTest()
 		{
 			var rows = await GetAllRowsFromFileAsync();

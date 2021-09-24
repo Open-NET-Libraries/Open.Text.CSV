@@ -27,19 +27,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-		<PackageReference Include="System.Buffers" Version="4.5.1" />
-		<PackageReference Include="System.Memory" Version="4.5.4" />
-		<PackageReference Include="System.Threading.Channels" Version="5.0.0" />
+	  <Compile Remove="Archive\**" />
+	  <EmbeddedResource Remove="Archive\**" />
+	  <None Remove="Archive\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="CsvAsyncReader.cs" />
-		<Compile Remove="CsvData.cs" />
-		<Compile Remove="CsvRead.cs" />
-		<Compile Remove="CsvRowEnumerator.cs" />
-		<Compile Remove="CsvRowEnumeratorBase.cs" />
-		<Compile Remove="Web.cs" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Include="System.Threading.Channels" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,6 +47,8 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+		<PackageReference Include="System.Buffers" Version="4.5.1" />
+		<PackageReference Include="System.Memory" Version="4.5.4" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 	</ItemGroup>
 
