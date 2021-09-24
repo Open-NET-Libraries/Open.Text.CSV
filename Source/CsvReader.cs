@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace Open.Text.CSV
 {
@@ -85,6 +88,82 @@ namespace Open.Text.CSV
 			var list = new List<IList<string>>();
 			foreach (var row in csv.ReadRows()) list.Add(row);
 			return list;
+		}
+
+		public static IEnumerable<IList<string>> ReadAllRows(TextReader source)
+		{
+			using var csv = new CsvReader(source);
+			foreach (var row in csv.ReadRows()) yield return row;
+		}
+
+		public static ChannelReader<List<string>> ReadAllRowsAsync(TextReader source, int rowBufferCount = 3, int bufferSize = 4095)
+		{
+			if (rowBufferCount < 1) throw new ArgumentOutOfRangeException(nameof(rowBufferCount), rowBufferCount, "Must be at least 1.");
+			var	rowBuffer = Channel.CreateBounded<List<string>>(new BoundedChannelOptions(rowBufferCount)
+			{
+				SingleWriter = true,
+				AllowSynchronousContinuations = true
+			});
+
+			_ = Task.Run(async () =>
+			{
+				var writer = rowBuffer.Writer;
+				List<string>? nextRow = null;
+				var rowBuilder = new CsvRowBuilder(row => nextRow = row);
+				var pool = ArrayPool<char>.Shared;
+				var cNext = pool.Rent(bufferSize);
+				var cCurrent = pool.Rent(bufferSize);
+
+				try
+				{
+#if NETSTANDARD2_1_OR_GREATER
+					var next = source.ReadAsync(cNext);
+#else
+					var next = source.ReadAsync(cNext, 0, cNext.Length);
+#endif
+				loop:
+					var n = await next.ConfigureAwait(false);
+					if (n == 0)
+					{
+						writer.Complete();
+						return;
+					}
+
+					// Preemptive request.
+#if NETSTANDARD2_1_OR_GREATER
+					var current = source.ReadAsync(cCurrent);
+#else
+					var current = source.ReadAsync(cCurrent, 0, cCurrent.Length);
+#endif
+					if (rowBuilder.Add(cNext.AsMemory(0, n), out var remaining))
+					{
+						do 
+						{
+							Debug.Assert(nextRow != null);
+							await writer.WriteAsync(nextRow!).ConfigureAwait(false);
+						}
+						while (rowBuilder.Add(remaining, out remaining));
+					}
+
+					var swap = cNext;
+					cNext = cCurrent;
+					cCurrent = swap;
+					next = current;
+
+					goto loop;
+				}
+				catch (Exception ex)
+				{
+					writer.Complete(ex);
+				}
+				finally
+				{
+					pool.Return(cNext);
+					pool.Return(cCurrent);
+				}
+			});
+
+			return rowBuffer.Reader;
 		}
 	}
 }

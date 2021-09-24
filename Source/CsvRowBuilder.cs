@@ -203,6 +203,24 @@ namespace Open.Text.CSV
 			return false;
 		}
 
+		public bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining)
+		{
+			var len = chars.Length;
+			var span = chars.Span;
+			for (var i = 0; i < len; i++)
+			{
+				if (AddChar(span[i]))
+				{
+					var n = i + 1;
+					remaining = n == chars.Length ? ReadOnlyMemory<char>.Empty : chars.Slice(n);
+					return true;
+				}
+			}
+
+			remaining = ReadOnlyMemory<char>.Empty;
+			return false;
+		}
+
 		public bool Add(string chars, out ReadOnlySpan<char> remaining)
 			=> Add(chars.AsSpan(), out remaining);
 

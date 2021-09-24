@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using Open.ChannelExtensions;
 
 namespace Open.Text.CSV.Test
 {
@@ -85,6 +86,16 @@ namespace Open.Text.CSV.Test
 			using var sr = new StreamReader(fs);
 			var rows = new List<string>();
 			while (!sr.EndOfStream) rows.Add(await sr.ReadLineAsync().ConfigureAwait(false));
+			Assert.NotEmpty(rows);
+		}
+
+		[Fact]
+		public async Task ChannelReaderPerformanceTest()
+		{
+			using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
+			using var sr = new StreamReader(fs);
+			var rows = new List<List<string>>();
+			await CsvReader.ReadAllRowsAsync(sr).ReadAll(rows.Add);
 			Assert.NotEmpty(rows);
 		}
 
