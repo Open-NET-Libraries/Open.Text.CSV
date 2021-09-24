@@ -186,8 +186,7 @@ namespace Open.Text.CSV
 			Debug.Assert(c == -1 || c == '\n');
 			return Complete();
 		}
-
-		public bool AddNextChars(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining)
+		public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining)
 		{
 			var len = chars.Length;
 			for (var i = 0; i < len; i++)
@@ -204,8 +203,8 @@ namespace Open.Text.CSV
 			return false;
 		}
 
-		public bool AddNextChars(string chars, out ReadOnlySpan<char> remaining)
-			=> AddNextChars(chars.AsSpan(), out remaining);
+		public bool Add(string chars, out ReadOnlySpan<char> remaining)
+			=> Add(chars.AsSpan(), out remaining);
 
 		void AddNextChar(in int c, bool ws = false)
 		{
