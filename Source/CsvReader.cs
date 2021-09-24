@@ -24,12 +24,14 @@ namespace Open.Text.CSV
 
 		loop:
 			c = s.Read();
+
 			if (c == -1)
 			{
 				var rowReady = _rowBuilder.EndRow();
 				rowBuffer = _nextRow;
 				return rowReady;
 			}
+
 			if (_rowBuilder.AddChar(c))
 			{
 				rowBuffer = _nextRow;
