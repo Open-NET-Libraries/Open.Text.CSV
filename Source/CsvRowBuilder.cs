@@ -14,7 +14,8 @@ namespace Open.Text.CSV
 		readonly StringBuilder _fb = new();
 
 		State _state = State.BeforeField;
-		int _len = 0;
+		int _fieldLen = 0;
+		int _maxFields = 0;
 
 		private readonly Action<List<string>> _rowHandler;
 
@@ -44,11 +45,16 @@ namespace Open.Text.CSV
 		{
 			_state = State.BeforeField;
 			_fb.Clear();
-			var f = _fields;
-			_fields = null;
-			if (f is null || f.Count == 0) return false;
-			_rowHandler(f);
 
+			var f = _fields;
+			if (f is null) return false;
+			_fields = null;
+
+			var count = f.Count;
+			if (count == 0) return false;
+			if (count > _maxFields) _maxFields = count;
+
+			_rowHandler(f);
 			return true;
 		}
 
@@ -186,6 +192,25 @@ namespace Open.Text.CSV
 			Debug.Assert(c == -1 || c == '\n');
 			return Complete();
 		}
+
+		public bool Add(in ArraySegment<char> chars, out ArraySegment<char> remaining)
+		{
+			var a = chars.Array;
+			var end = chars.Offset + chars.Count;
+			for (var i = chars.Offset; i < end; i++)
+			{
+				if (AddChar(a[i]))
+				{
+					var n = i + 1;
+					remaining = n == end ? default : new ArraySegment<char>(a, n, end-n);
+					return true;
+				}
+			}
+
+			remaining = default;
+			return false;
+		}
+
 		public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining)
 		{
 			var len = chars.Length;
@@ -227,23 +252,23 @@ namespace Open.Text.CSV
 		void AddNextChar(in int c, bool ws = false)
 		{
 			_fb.Append((char)c);
-			if (!ws) _len = _fb.Length;
+			if (!ws) _fieldLen = _fb.Length;
 		}
 
 		void AddEntry()
 		{
-			_fields ??= new List<string>();
-			if (_len == 0)
+			_fields ??= new List<string>(_maxFields);
+			if (_fieldLen == 0)
 			{
 				_fields.Add(string.Empty);
 				if (_fb.Length != 0) _fb.Clear();
 				return;
 			}
 
-			if (_len < _fb.Length) _fb.Length = _len;
+			if (_fieldLen < _fb.Length) _fb.Length = _fieldLen;
 			_fields.Add(_fb.ToString());
 			_fb.Clear();
-			_len = 0;
+			_fieldLen = 0;
 		}
 
 		enum State

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -9,9 +10,13 @@ namespace Open.Text.CSV
 		protected CsvReaderBase(TextReader source)
 		{
 			_source = source ?? throw new ArgumentNullException(nameof(source));
+			RowBuilder = new(SetNextRow);
 		}
 
-		protected const string CORRUPT_FIELD = "Corrupt field found. A double quote is not escaped or there is extra data after a quoted field.";
+		protected readonly CsvRowBuilder RowBuilder;
+		protected List<string>? NextRow;
+		void SetNextRow(List<string> row) => NextRow = row;
+
 		TextReader? _source;
 		protected TextReader Source => _source ?? throw new ObjectDisposedException(GetType().ToString());
 
@@ -19,18 +24,5 @@ namespace Open.Text.CSV
 		{
 			_source = null; // The intention here is if this object is disposed, then prevent further reading.
 		}
-
-		protected enum State
-		{
-			BeforeField,
-			InField,
-			InQuotedField,
-			Quote,
-			AfterQuotedField,
-			EndOfRow,
-		}
-
-		protected StringBuilder? FieldBuffer;
-
 	}
 }
