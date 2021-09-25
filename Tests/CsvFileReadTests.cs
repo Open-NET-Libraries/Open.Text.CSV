@@ -29,6 +29,23 @@ namespace Open.Text.CSV.Test
 		}
 
 		[Benchmark]
+		public List<List<string>> GetAllRowsFromFile_Sylvan()
+		{
+			using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV);
+			var fields = reader.FieldCount;
+			var rows = new List<List<string>>();
+			while(reader.Read())
+			{
+				var row = new List<string>();
+				for (var i = 0; i < fields; i++)
+					row.Add(reader.GetString(i));
+				rows.Add(row);
+			}
+			return rows;
+
+		}
+
+		[Benchmark]
 		public async Task<IList<IList<string>>> GetAllRowsFromFileAsync()
 			=> await CsvReader.GetAllRowsFromFileAsync(TEST_DATA_CSV);
 
