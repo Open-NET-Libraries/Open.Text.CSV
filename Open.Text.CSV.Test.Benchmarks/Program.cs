@@ -6,8 +6,9 @@ namespace Open.Text.CSV.Test.Benchmarks
 	{
 		static void Main()
 		{
-			BenchmarkRunner.Run<CsvFileReadTests>();
+			//BenchmarkRunner.Run<CsvFileReadTests>();
 			//BenchmarkRunner.Run<FileReadMethodTests>();
+			BenchmarkRunner.Run<CsvFileParallelReadTests>();
 		}
 	}
 }
