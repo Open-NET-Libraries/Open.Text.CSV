@@ -9,6 +9,7 @@ using Xunit;
 namespace Open.Text.CSV.Test
 {
 	//[MemoryDiagnoser]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Benchmarking")]
 	public class CsvFileReadTests
 	{
 		static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();

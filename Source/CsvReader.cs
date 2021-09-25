@@ -225,7 +225,7 @@ namespace Open.Text.CSV
 			try
 			{
 #if NETSTANDARD2_1_OR_GREATER
-				var next = source.ReadAsync(cNext);
+				var next = source.ReadAsync(cNext, cancellationToken);
 #else
 				var next = source.ReadAsync(cNext, 0, cNext.Length);
 #endif
@@ -239,7 +239,7 @@ namespace Open.Text.CSV
 
 				// Preemptive request.
 #if NETSTANDARD2_1_OR_GREATER
-				var current = source.ReadAsync(cCurrent);
+				var current = source.ReadAsync(cCurrent, cancellationToken);
 #else
 				var current = source.ReadAsync(cCurrent, 0, cCurrent.Length);
 #endif
@@ -262,7 +262,7 @@ namespace Open.Text.CSV
 			}
 			catch (TaskCanceledException)
 			{
-				writer.TryComplete(); // only concerned about the channel writer.WriteAsync call.
+				writer.TryComplete();
 			}
 			catch (Exception ex)
 			{
@@ -302,7 +302,7 @@ namespace Open.Text.CSV
 			var rowBuffer = CreateRowBuffer(rowBufferCount);
 			Contract.EndContractBlock();
 
-			_ = ReadRowsToChannelAsync(source, rowBuffer, charBufferSize, cancellationToken);
+			_ = ReadRowsToChannelAsync(source, rowBuffer, charBufferSize, cancellationToken).AsTask();
 			var reader = rowBuffer.Reader;
 
 		loop:
@@ -322,6 +322,7 @@ namespace Open.Text.CSV
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2016:Forward the 'CancellationToken' parameter to methods", Justification = "Is handled internally.")]
 		public static ChannelReader<IList<string>> ReadRowsToChannel(
 			string filepath,
 			int rowBufferCount = -1,
@@ -348,6 +349,13 @@ namespace Open.Text.CSV
 
 #if NETSTANDARD2_1_OR_GREATER
 
+		public async IAsyncEnumerable<IList<string>> ReadRowsAsync()
+		{
+			IList<string>? row;
+			while ((row = await ReadNextRowAsync().ConfigureAwait(false)) is not null)
+				yield return row;
+		}
+
 		public static async IAsyncEnumerable<IList<string>> ReadRowsBufferedAsync(
 			TextReader source,
 			int rowBufferCount = 3,
@@ -358,7 +366,7 @@ namespace Open.Text.CSV
 			var rowBuffer = CreateRowBuffer(rowBufferCount);
 			Contract.EndContractBlock();
 
-			_ = ReadRowsToChannelAsync(source, rowBuffer, charBufferSize, cancellationToken);
+			_ = ReadRowsToChannelAsync(source, rowBuffer, charBufferSize, cancellationToken).AsTask();
 			var reader = rowBuffer.Reader;
 
 		loop:
