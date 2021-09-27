@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Text.CSV", "Source\Ope
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Text.CSV.Test", "Tests\Open.Text.CSV.Test.csproj", "{8973FF80-C8AA-42D0-AE19-5D64D883177A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Open.Text.CSV.Test.Benchmarks", "Open.Text.CSV.Test.Benchmarks\Open.Text.CSV.Test.Benchmarks.csproj", "{B8A59951-B7DB-4CBF-A492-F79A5F58C948}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Text.CSV.Test.Benchmarks", "Open.Text.CSV.Test.Benchmarks\Open.Text.CSV.Test.Benchmarks.csproj", "{B8A59951-B7DB-4CBF-A492-F79A5F58C948}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1BA86818-EE88-4F44-BBA4-F63E74A4C850}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
