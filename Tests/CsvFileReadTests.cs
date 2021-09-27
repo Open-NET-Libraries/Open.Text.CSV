@@ -28,21 +28,65 @@ namespace Open.Text.CSV.Test
 			Assert.Equal(ExpectedLineCount, rows.Count);
 		}
 
+		[Fact]
 		[Benchmark]
 		public List<List<string>> GetAllRowsFromFile_Sylvan()
 		{
 			using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV);
 			var fields = reader.FieldCount;
 			var rows = new List<List<string>>();
-			while(reader.Read())
+			while (reader.Read())
 			{
-				var row = new List<string>();
+				var row = new List<string>(fields);
 				for (var i = 0; i < fields; i++)
 					row.Add(reader.GetString(i));
 				rows.Add(row);
 			}
 			return rows;
 
+		}
+
+		[Fact]
+		[Benchmark]
+		public List<Record> GetAllRowsFromFile_Sylvan_StrongType()
+		{
+			using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV);
+			var fields = reader.FieldCount;
+			var rows = new List<Record>();
+			while (reader.Read())
+			{
+				var record = new Record();
+				record.GlobalRank = reader.GetInt32(0);
+				record.TldRank = reader.GetInt32(1);
+				record.Domain = reader.GetString(2);
+				record.TLD = reader.GetString(3);
+				record.RefSubNets = reader.GetInt32(4);
+				record.RefIPs = reader.GetInt32(5);
+				record.IDN_Domain = reader.GetString(6);
+				record.IDN_TLD = reader.GetString(7);
+				record.PrevGlobalRank = reader.GetInt32(8);
+				record.PrevTldRank = reader.GetInt32(9);
+				record.PrevRefSubNets = reader.GetInt32(10);
+				record.PrevRefIPs = reader.GetInt32(11);
+				rows.Add(record);
+			}
+			return rows;
+		}
+
+		public class Record
+		{
+			public int GlobalRank { get; set; }
+			public int TldRank { get; set; }
+			public string Domain { get; set; }
+			public string TLD { get; set; }
+			public int RefSubNets { get; set; }
+			public int RefIPs { get; set; }
+			public string IDN_Domain { get; set; }
+			public string IDN_TLD { get; set; }
+			public int PrevGlobalRank { get; set; }
+			public int PrevTldRank { get; set; }
+			public int PrevRefSubNets { get; set; }
+			public int PrevRefIPs { get; set; }
 		}
 
 		[Benchmark]
