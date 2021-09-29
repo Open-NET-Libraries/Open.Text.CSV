@@ -98,6 +98,7 @@ namespace Open.Text.CSV
 					{
 						case ' ':
 						case '\t':
+							// Potentially the end of a field.
 							AddNextChar(in c, true);
 							return false;
 
