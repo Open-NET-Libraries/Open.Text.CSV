@@ -154,8 +154,8 @@ namespace Open.Text.CSV
 				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
 			Contract.EndContractBlock();
 
-			using var sr = new FileInfo(filepath).OpenText();
 			var list = new List<IList<string>>();
+			using var sr = new FileInfo(filepath).OpenText();
 			foreach (var row in ReadRows(sr)) list.Add(row);
 			return list;
 		}
@@ -168,11 +168,11 @@ namespace Open.Text.CSV
 				throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
 			Contract.EndContractBlock();
 
+			IList<string>? row;
+			var list = new List<IList<string>>();
 			var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read, DEFAULT_BUFFER_SIZE, true);
 			var sr = new StreamReader(fs);
 			var csv = new CsvReader(sr);
-			var list = new List<IList<string>>();
-			IList<string>? row;
 			while ((row = await csv.ReadNextRowAsync().ConfigureAwait(false)) is not null)
 				list.Add(row);
 			return list;
@@ -181,7 +181,8 @@ namespace Open.Text.CSV
 		public static IEnumerable<IList<string>> ReadRows(TextReader source)
 		{
 			using var csv = new CsvReader(source);
-			foreach (var row in csv.ReadRows()) yield return row;
+			foreach (var row in csv.ReadRows())
+				yield return row;
 		}
 
 		public static IEnumerable<IList<string>> ReadRows(Stream stream)
@@ -192,7 +193,8 @@ namespace Open.Text.CSV
 
 			using var sr = new StreamReader(stream);
 			using var csv = new CsvReader(sr);
-			foreach (var row in csv.ReadRows()) yield return row;
+			foreach (var row in csv.ReadRows())
+				yield return row;
 		}
 
 		public static IEnumerable<IList<string>> ReadRows(string csvText)
@@ -202,7 +204,8 @@ namespace Open.Text.CSV
 
 			using var sr = new StringReader(csvText);
 			using var csv = new CsvReader(sr);
-			foreach (var row in csv.ReadRows()) yield return row;
+			foreach (var row in csv.ReadRows())
+				yield return row;
 		}
 
 		public static async ValueTask ReadRowsToChannelAsync(

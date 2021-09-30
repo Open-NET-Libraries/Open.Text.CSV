@@ -15,10 +15,10 @@ namespace Open.Text.CSV.Test
 		public void GetAllRowsFromFileInParallel()
 		{
 			Parallel.Invoke(
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile
+				_root.GetAllRowsFromFileTest,
+				_root.GetAllRowsFromFileTest,
+				_root.GetAllRowsFromFileTest,
+				_root.GetAllRowsFromFileTest
 			);
 		}
 

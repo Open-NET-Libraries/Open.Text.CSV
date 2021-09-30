@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Toolkit.HighPerformance.Buffers;
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +16,9 @@ namespace Open.Text.CSV
 		const string CORRUPT_FIELD = "Corrupt field found. A double quote is not escaped or there is extra data after a quoted field.";
 
 		List<string>? _fields;
+		readonly StringPool _stringPool = new();
 		readonly StringBuilder _fb = new();
+		//readonly MemoryBufferWriter<char> _bw = new MemoryBufferWriter<char> ();
 
 		State _state = State.BeforeField;
 		int _fieldLen = 0;
@@ -295,7 +299,7 @@ namespace Open.Text.CSV
 			}
 
 			if (_fieldLen < _fb.Length) _fb.Length = _fieldLen;
-			_fields.Add(_fb.ToString());
+			_fields.Add(_stringPool.GetOrAdd(_fb.ToString()));
 			_fb.Clear();
 			_fieldLen = 0;
 		}
