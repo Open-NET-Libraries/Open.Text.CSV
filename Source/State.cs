@@ -1,4 +1,0 @@
-﻿namespace Open.Text.CSV
-{
-
-}
