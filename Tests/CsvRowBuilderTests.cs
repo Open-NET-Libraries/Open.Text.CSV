@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Xunit;
+﻿using Xunit;
 
 namespace Open.Text.CSV.Test
 {
@@ -8,39 +7,68 @@ namespace Open.Text.CSV.Test
 		[Fact]
 		public static void BasicRowBuildTest()
 		{
-			var rows = new List<List<string>>(3);
-			var rb = new CsvRowBuilder(rows.Add);
-			List<string> row;
+			var rb = new CsvRowBuilder();
 			rb.Add("\"A\", B, C,\r\n", out _);
-			Assert.Single(rows);
-			row = rows[0];
+			var row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
 			Assert.Equal("C", row[2]);
 
 			rb.Add("D, \"E\", F\n", out _);
-			Assert.Equal(2, rows.Count);
-			row = rows[1];
+			row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
 			Assert.Equal("F", row[2]);
 
 			rb.Add("G, H, I", out _);
 			rb.EndRow();
-			Assert.Equal(3, rows.Count);
-			row = rows[2];
+			row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
 			Assert.Equal("I", row[2]);
 
 			rb.Add("J, K, \"L\nX\"", out _);
 			rb.EndRow();
-			Assert.Equal(4, rows.Count);
-			row = rows[3];
+			row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
 			Assert.Equal("L\nX", row[2]);
 
 			rb.Add("L, M, N,\nO,P,Q", out var remaining);
-			Assert.Equal(5, rows.Count);
-			row = rows[4];
+			row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
+			Assert.Equal("N", row[2]);
+			Assert.Equal(5, remaining.Length);
+
+
+		}
+
+
+		[Fact]
+		public static void BasicRowBuildTest2()
+		{
+			var rb = new CsvRowBuilder2(3);
+			rb.Add("\"A\", B, C,\r\n", out _);
+			var row = rb.LatestCompleteRow.Memory.Span;
+			Assert.Equal(3, row.Length);
+			Assert.Equal("C", row[2]);
+
+			rb.Add("D, \"E\", F\n", out _);
+			row = rb.LatestCompleteRow.Memory.Span;
+			Assert.Equal(3, row.Length);
+			Assert.Equal("F", row[2]);
+
+			rb.Add("G, H, I", out _);
+			rb.EndRow();
+			row = rb.LatestCompleteRow.Memory.Span;
+			Assert.Equal(3, row.Length);
+			Assert.Equal("I", row[2]);
+
+			rb.Add("J, K, \"L\nX\"", out _);
+			rb.EndRow();
+			row = rb.LatestCompleteRow.Memory.Span;
+			Assert.Equal(3, row.Length);
+			Assert.Equal("L\nX", row[2]);
+
+			rb.Add("L, M, N,\nO,P,Q", out var remaining);
+			row = rb.LatestCompleteRow.Memory.Span;
+			Assert.Equal(3, row.Length);
 			Assert.Equal("N", row[2]);
 			Assert.Equal(5, remaining.Length);
 

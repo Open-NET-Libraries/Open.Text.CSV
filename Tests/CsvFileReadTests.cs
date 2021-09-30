@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Open.ChannelExtensions;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -37,10 +38,29 @@ namespace Open.Text.CSV.Test
 			return rows;
 		}
 
+		[Benchmark(Baseline = true)]
+		public int GetAllRowsFromFile2()
+		{
+			int count = 0;
+			using var sr = new FileInfo(TEST_DATA_CSV).OpenText();
+			using var csv = new CsvReader2(16, sr);
+			foreach (var row in csv.ReadRows())
+			{
+				row.Dispose();
+				if (++count == MaxRows) break;
+			}
+			return count;
+		}
+
 		[Fact]
 
 		public void GetAllRowsFromFileTest()
 			=> Assert.Equal(ExpectedLineCount, GetAllRowsFromFile().Count);
+
+		[Fact]
+
+		public void GetAllRowsFromFileTest2()
+			=> Assert.Equal(ExpectedLineCount, GetAllRowsFromFile2());
 
 		[Benchmark]
 		public List<List<string>> GetAllRowsFromFile_Sylvan()

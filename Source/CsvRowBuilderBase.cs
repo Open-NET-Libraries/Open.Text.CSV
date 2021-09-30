@@ -7,13 +7,15 @@ namespace Open.Text.CSV;
 /// <summary>
 /// Receives characters in a CSV sequence and translates them into values in a row.
 /// </summary>
-public abstract class CsvRowBuilderBase
+public abstract class CsvRowBuilderBase<TRow>
 {
 	const string CORRUPT_FIELD = "Corrupt field found. A double quote is not escaped or there is extra data after a quoted field.";
 
 	State _state = State.BeforeField;
 	protected int FieldLen = 0;
 	protected int MaxFields = 0;
+
+	public TRow? LatestCompleteRow { get; protected set; }
 
 	/// <summary>
 	/// Resets the row builder to the beginning of a row.
