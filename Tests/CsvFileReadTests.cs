@@ -28,7 +28,6 @@ namespace Open.Text.CSV.Test
 			Assert.Equal(ExpectedLineCount, rows.Count);
 		}
 
-		[Fact]
 		[Benchmark]
 		public List<List<string>> GetAllRowsFromFile_Sylvan()
 		{
