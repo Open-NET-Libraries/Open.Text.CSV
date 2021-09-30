@@ -9,23 +9,19 @@ namespace Open.Text.CSV;
 /// <summary>
 /// Receives characters in a CSV sequence and translates them into values in a row.
 /// </summary>
-public sealed class CsvRowBuilder2 : CsvRowBuilderBase<IMemoryOwner<string>>
+public sealed class MemoryCsvRowBuilder
+	: CsvRowBuilderBase<IMemoryOwner<string>>, IDisposable, ICsvRowBuilder<IList<string>>
 {
-	MemoryOwner<string>? _fields;
 	readonly StringPool _stringPool = new();
+	readonly ExpandableMemory<string> _fields = new();
 	readonly StringBuilder _fb = new();
-	int _fieldCount = 0;
 
-	public CsvRowBuilder2(int maxFields)
-	{
-		MaxFields = maxFields;
-	}
+	IList<string>? ICsvRowBuilder<IList<string>>.LatestCompleteRow => LatestCompleteRow?.Memory.ToArray();
 
 	/// <inheritdoc />
 	public override void Reset()
 	{
-		_fieldCount = 0;
-		_fields = null;
+		_fields.Clear();
 		base.Reset();
 	}
 
@@ -39,30 +35,34 @@ public sealed class CsvRowBuilder2 : CsvRowBuilderBase<IMemoryOwner<string>>
 
 	protected override void AddEntry()
 	{
-		_fields ??= MemoryOwner<string>.Allocate(MaxFields);
-
 		if (FieldLen == 0)
 		{
-			_fields.Memory.Span[_fieldCount++] = string.Empty;
+			_fields.Add(string.Empty);
 			if (_fb.Length != 0) _fb.Clear();
 			return;
 		}
 
 		if (FieldLen < _fb.Length) _fb.Length = FieldLen;
-		_fields.Memory.Span[_fieldCount++] = _stringPool.GetOrAdd(_fb.ToString());
+		_fields.Add(_stringPool.GetOrAdd(_fb.ToString()));
 		_fb.Clear();
 		FieldLen = 0;
 	}
 
 	protected override bool Complete()
 	{
-		var f = _fields;
-		var count = _fieldCount;
-		Reset();
-		if (f is null || count==0) return false;
-
-		LatestCompleteRow = f.Slice(0, count);
-		return true;
+		try
+		{
+			var count = _fields.Length;
+			if (count == 0) return false;
+			if (count > MaxFields) MaxFields = count;
+			LatestCompleteRow = _fields.ExtractOwner();
+			return true;
+		}
+		finally
+		{
+			Reset();
+		}
 	}
 
+	public void Dispose() => _fields.Dispose();
 }

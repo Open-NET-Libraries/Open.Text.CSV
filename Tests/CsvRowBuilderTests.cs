@@ -7,7 +7,7 @@ namespace Open.Text.CSV.Test
 		[Fact]
 		public static void BasicRowBuildTest()
 		{
-			var rb = new CsvRowBuilder();
+			var rb = new ListCsvRowBuilder();
 			rb.Add("\"A\", B, C,\r\n", out _);
 			var row = rb.LatestCompleteRow;
 			Assert.Equal(3, row.Count);
@@ -43,7 +43,7 @@ namespace Open.Text.CSV.Test
 		[Fact]
 		public static void BasicRowBuildTest2()
 		{
-			var rb = new CsvRowBuilder2(3);
+			var rb = new MemoryCsvRowBuilder();
 			rb.Add("\"A\", B, C,\r\n", out _);
 			var row = rb.LatestCompleteRow.Memory.Span;
 			Assert.Equal(3, row.Length);
@@ -71,8 +71,6 @@ namespace Open.Text.CSV.Test
 			Assert.Equal(3, row.Length);
 			Assert.Equal("N", row[2]);
 			Assert.Equal(5, remaining.Length);
-
-
 		}
 	}
 }

@@ -12,24 +12,24 @@ namespace Open.Text.CSV.Test
 		readonly CsvFileReadTests _root = new();
 
 		[Benchmark]
-		public void GetAllRowsFromFileInParallel()
+		public void CsvReader_GetAllRowsFromFileInParallel()
 		{
 			Parallel.Invoke(
-				_root.GetAllRowsFromFileTest,
-				_root.GetAllRowsFromFileTest,
-				_root.GetAllRowsFromFileTest,
-				_root.GetAllRowsFromFileTest
+				_root.CsvReader_GetAllRowsFromFileTest,
+				_root.CsvReader_GetAllRowsFromFileTest,
+				_root.CsvReader_GetAllRowsFromFileTest,
+				_root.CsvReader_GetAllRowsFromFileTest
 			);
 		}
 
 		[Benchmark]
-		public Task GetAllRowsFromFileAsyncParallel()
+		public Task CsvReader_GetAllRowsFromFileAsyncParallel()
 		{
 			return Task.WhenAll(
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync()
+				_root.CsvReader_GetAllRowsFromFileAsync(),
+				_root.CsvReader_GetAllRowsFromFileAsync(),
+				_root.CsvReader_GetAllRowsFromFileAsync(),
+				_root.CsvReader_GetAllRowsFromFileAsync()
 			);
 		}
 	}

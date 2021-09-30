@@ -8,13 +8,13 @@ namespace Open.Text.CSV;
 /// <summary>
 /// Receives characters in a CSV sequence and translates them into values in a row.
 /// </summary>
-public sealed class CsvRowBuilder : CsvRowBuilderBase<IList<string>>
+public sealed class ListCsvRowBuilder : CsvRowBuilderBase<IList<string>>
 {
 	List<string>? _fields;
 	readonly StringPool _stringPool = new();
 	readonly StringBuilder _fb = new();
 
-	public CsvRowBuilder()
+	public ListCsvRowBuilder()
 	{
 	}
 
