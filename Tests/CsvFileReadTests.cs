@@ -32,7 +32,10 @@ namespace Open.Text.CSV.Test
 		[Benchmark]
 		public List<List<string>> GetAllRowsFromFile_Sylvan()
 		{
-			using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV);
+			using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV, new Sylvan.Data.Csv.CsvDataReaderOptions
+			{
+				HasHeaders = false
+			});
 			var fields = reader.FieldCount;
 			var rows = new List<List<string>>();
 			while (reader.Read())
@@ -43,7 +46,14 @@ namespace Open.Text.CSV.Test
 				rows.Add(row);
 			}
 			return rows;
+		}
 
+		[Fact]
+		public void GetAllRowsFromFileTest_Sylvan()
+		{
+			var rows = GetAllRowsFromFile_Sylvan();
+			Assert.Equal(ExpectedLineCount, rows.Count);
+			Assert.Equal(Data, rows);
 		}
 
 		[Fact]

@@ -260,7 +260,7 @@ namespace Open.Text.CSV
 
 				goto loop;
 			}
-			catch (TaskCanceledException)
+			catch (OperationCanceledException)
 			{
 				writer.TryComplete();
 			}
@@ -317,7 +317,7 @@ namespace Open.Text.CSV
 				if (reader.WaitToReadAsync(cancellationToken).AsTask().Result)
 					goto loop;
 			}
-			catch (TaskCanceledException)
+			catch (OperationCanceledException)
 			{
 			}
 		}
@@ -381,7 +381,7 @@ namespace Open.Text.CSV
 				if (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
 					goto loop;
 			}
-			catch (TaskCanceledException)
+			catch (OperationCanceledException)
 			{
 			}
 		}
