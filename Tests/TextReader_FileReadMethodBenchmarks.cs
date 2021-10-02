@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Open.Text.CSV.Test;
 
-public class FileReadMethodBenchmarks
+public class TextReader_FileReadMethodBenchmarks
 {
 	protected const string TEST_FILE = CsvFileReadTests.TEST_DATA_CSV;
 
@@ -33,7 +33,7 @@ public class FileReadMethodBenchmarks
 
 	readonly Lazy<string> Preloaded;
 
-	public FileReadMethodBenchmarks()
+	public TextReader_FileReadMethodBenchmarks()
 		=> Preloaded = new Lazy<string>(() => File.ReadAllText(TEST_FILE));
 
 	[IterationSetup]
@@ -134,7 +134,7 @@ public class FileReadMethodBenchmarks
 	}
 }
 
-public class FileReadMethodTests : FileReadMethodBenchmarks
+public class FileReadMethodTests : TextReader_FileReadMethodBenchmarks
 {
 	static readonly int ExpectedCharacterCount = GetExpectedCharacterCount();
 
