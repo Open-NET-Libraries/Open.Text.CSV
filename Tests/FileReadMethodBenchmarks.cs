@@ -8,18 +8,16 @@ namespace Open.Text.CSV.Test
 {
 	public class FileReadMethodBenchmarks
 	{
+		protected const string TEST_FILE = CsvFileReadTests.TEST_DATA_CSV;
+
 		[Params(1024, 4096, 16384)]
 		public int BufferSize { get; set; } = 4096;
 
 		[Params(true, false)]
 		public bool UseAsync { get; set; } = false;
 
-		[Params(100000)]
-		public int MaxRows { get; set; } = -1;
-
-
 		FileStream GetStream() => new(
-			CsvFileReadTests.TEST_DATA_CSV,
+			TEST_FILE,
 			FileMode.Open,
 			FileAccess.Read,
 			FileShare.Read,
@@ -66,11 +64,9 @@ namespace Open.Text.CSV.Test
 		public int StreamReader_Read()
 		{
 			var count = 0;
-			while (Reader.Read(Buffer) is not 0)
-			{
-				count++;
-				if (count == MaxRows) break;
-			}
+			int next;
+			while ((next = Reader.Read(Buffer)) is not 0)
+				count += next;
 			return count;
 		}
 
@@ -78,11 +74,9 @@ namespace Open.Text.CSV.Test
 		public async Task<int> StreamReader_ReadAsync()
 		{
 			var count = 0;
-			while (await Reader.ReadAsync(Buffer).ConfigureAwait(false) is not 0)
-			{
-				count++;
-				if (count == MaxRows) break;
-			}
+			int next;
+			while ((next = await Reader.ReadAsync(Buffer).ConfigureAwait(false)) is not 0)
+				count += next;
 			return count;
 		}
 
@@ -91,10 +85,7 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			while (Reader.ReadLine() is not null)
-			{
 				count++;
-				if (count == MaxRows) break;
-			}
 			return count;
 		}
 
@@ -103,10 +94,7 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			while (await Reader.ReadLineAsync().ConfigureAwait(false) is not null)
-			{
 				count++;
-				if (count == MaxRows) break;
-			}
 			return count;
 		}
 
@@ -115,10 +103,7 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			await foreach (var buffer in Reader.SingleBufferReadAsync(BufferSize))
-			{
-				count++;
-				if (count == MaxRows) break;
-			}
+				count += buffer.Length;
 			return count;
 		}
 
@@ -127,10 +112,7 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			await foreach (var buffer in Reader.DualBufferReadAsync(BufferSize))
-			{
-				count++;
-				if (count == MaxRows) break;
-			}
+				count += buffer.Length;
 			return count;
 		}
 
@@ -139,32 +121,39 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			await foreach (var buffer in Reader.PreemptiveReadLineAsync())
-			{
 				count++;
-				if (count == MaxRows) break;
-			}
 			return count;
 		}
 	}
 
 	public class FileReadMethodTests : FileReadMethodBenchmarks
 	{
+		static readonly int ExpectedCharacterCount = GetExpectedCharacterCount();
 
-		[Fact]
-		public void StreamReader_ReadLineTest() => Run(
-			()=> Assert.Equal(
-				CsvFileReadTests.ExpectedLineCount,
-				StreamReader_ReadLine()));
+		static int GetExpectedCharacterCount()
+		{
+			var buffer = new char[4096];
+			using var sr = new StreamReader(TEST_FILE);
+			var count = 0;
+			int next;
+			while ((next = sr.Read(buffer)) is not 0)
+			{
+				count += next;
+			}
+			return count;
+		}
 
 		[Fact]
 		public Task StreamReader_SingleBufferReadAsyncTest() => Run(
-			async () => Assert.NotEqual(
-				0, await StreamReader_SingleBufferReadAsync()));
+			async () => Assert.Equal(
+				ExpectedCharacterCount,
+				await StreamReader_SingleBufferReadAsync()));
 
 		[Fact]
 		public Task StreamReader_DualBufferReadAsyncTest() => Run(
-			async () => Assert.NotEqual(
-				0, await StreamReader_DualBufferReadAsync()));
+			async () => Assert.Equal(
+				ExpectedCharacterCount,
+				await StreamReader_DualBufferReadAsync()));
 
 		[Fact]
 		public Task StreamReader_PreemptiveReadLineAsyncTest() => Run(
