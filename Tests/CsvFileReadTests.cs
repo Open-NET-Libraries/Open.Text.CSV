@@ -11,7 +11,7 @@ namespace Open.Text.CSV.Test
 	[MemoryDiagnoser]
 	public class CsvFileReadTests
 	{
-		static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
+		public static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
 		const int BENCH_ROWS = 100000; // ExpectedLineCount;
 
 		[Params(BENCH_ROWS)]
@@ -132,7 +132,7 @@ namespace Open.Text.CSV.Test
 		}
 
 		[Fact]
-		public void GetAllRowsFromFileTest_Sylvan_StrongType()
+		public void Sylvan_GetAllRowsFromFileTest_StrongType()
 			=> Assert.Equal(ExpectedLineCount-1, Sylvan_GetAllRowsFromFile_StrongType().Count);
 
 		public class Record
