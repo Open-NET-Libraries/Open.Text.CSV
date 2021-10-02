@@ -1,15 +1,14 @@
 ﻿using BenchmarkDotNet.Running;
 
-namespace Open.Text.CSV.Test.Benchmarks
+namespace Open.Text.CSV.Test.Benchmarks;
+
+class Program
 {
-	class Program
+	static void Main()
 	{
-		static void Main()
-		{
-			//BenchmarkRunner.Run<StringBuilderVsMemoryOwner>();
-			//BenchmarkRunner.Run<CsvFileReadTests>();
-			BenchmarkRunner.Run<FileReadMethodBenchmarks>();
-			//BenchmarkRunner.Run<CsvFileParallelReadTests>();
-		}
+		//BenchmarkRunner.Run<StringBuilderVsMemoryOwner>();
+		//BenchmarkRunner.Run<CsvFileReadTests>();
+		BenchmarkRunner.Run<FileReadMethodBenchmarks>();
+		//BenchmarkRunner.Run<CsvFileParallelReadTests>();
 	}
 }
