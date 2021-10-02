@@ -106,7 +106,7 @@ public class TextReader_FileReadMethodBenchmarks
 		return count;
 	}
 
-	[Benchmark]
+	//[Benchmark]
 	public async Task<int> StreamReader_SingleBufferReadAsync()
 	{
 		var count = 0;
