@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
 using System.IO;
+using System.IO.Pipelines;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -11,7 +12,6 @@ namespace Open.Text.CSV.Test
 		protected StreamReader Reader { get; private set; }
 		protected char[] CharBuffer { get; private set; }
 
-		[IterationSetup]
 		public override void Setup()
 		{
 			base.Setup();
@@ -19,7 +19,6 @@ namespace Open.Text.CSV.Test
 			CharBuffer = new char[BufferSize];
 		}
 
-		[IterationCleanup]
 		public override void Cleanup()
 		{
 			Reader.Dispose();
@@ -48,6 +47,21 @@ namespace Open.Text.CSV.Test
 		}
 
 		[Benchmark]
+		public async Task<long> PipeReader_EnumerateAsync()
+		{
+			long count = 0;
+			await foreach (var buffer in PipeReader
+				.Create(Stream)
+				.EnumerateAsync()
+				.DecodeAsync())
+			{
+				count += buffer.WrittenMemory.Length;
+			}
+
+			return count;
+		}
+
+		//[Benchmark]
 		public int StreamReader_ReadLine()
 		{
 			var count = 0;
@@ -56,7 +70,7 @@ namespace Open.Text.CSV.Test
 			return count;
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public async Task<int> StreamReader_ReadLineAsync()
 		{
 			var count = 0;
@@ -65,7 +79,7 @@ namespace Open.Text.CSV.Test
 			return count;
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public async Task<int> StreamReader_SingleBufferReadAsync()
 		{
 			var count = 0;
@@ -74,7 +88,7 @@ namespace Open.Text.CSV.Test
 			return count;
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public async Task<int> StreamReader_DualBufferReadAsync()
 		{
 			var count = 0;
@@ -83,7 +97,7 @@ namespace Open.Text.CSV.Test
 			return count;
 		}
 
-		[Benchmark]
+		//[Benchmark]
 		public async Task<int> StreamReader_PreemptiveReadLineAsync()
 		{
 			var count = 0;
