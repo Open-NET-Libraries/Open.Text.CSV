@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Open.Text.CSV.Test.PipelineBenchmarks-20211003-093651</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1237 (21H1/May2021Update)
+AMD Ryzen 5 4500U with Radeon Graphics, 1 CPU, 6 logical and 6 physical cores
+.NET SDK=6.0.100-rc.1.21463.6
+  [Host]     : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+  Job-QYBRXV : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+</code></pre>
+<pre><code>InvocationCount=1  UnrollFactor=1  
+</code></pre>
+
+<table>
+<thead><tr><th>             Method</th><th>BufferSize</th><th>UseAsync</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th>
+</tr>
+</thead><tbody><tr><td>PipeReader_EnumerateAsync</td><td>4096</td><td>False</td><td>343.94 ms</td><td>6.701 ms</td><td>10.233 ms</td><td>346.01 ms</td><td>3.99</td><td>1.45</td>
+</tr><tr><td>FileStream_Read</td><td>4096</td><td>False</td><td>88.62 ms</td><td>9.660 ms</td><td>28.484 ms</td><td>101.81 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>4096</td><td>False</td><td>70.00 ms</td><td>0.991 ms</td><td>0.878 ms</td><td>69.94 ms</td><td>0.70</td><td>0.22</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>4096</td><td>True</td><td>242.94 ms</td><td>4.764 ms</td><td>9.180 ms</td><td>243.31 ms</td><td>0.90</td><td>0.20</td>
+</tr><tr><td>FileStream_Read</td><td>4096</td><td>True</td><td>249.27 ms</td><td>21.865 ms</td><td>64.468 ms</td><td>267.99 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>4096</td><td>True</td><td>212.42 ms</td><td>4.229 ms</td><td>7.294 ms</td><td>212.61 ms</td><td>0.78</td><td>0.18</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>False</td><td>128.58 ms</td><td>8.079 ms</td><td>23.820 ms</td><td>126.84 ms</td><td>3.34</td><td>1.25</td>
+</tr><tr><td>FileStream_Read</td><td>16384</td><td>False</td><td>41.74 ms</td><td>3.632 ms</td><td>10.710 ms</td><td>43.46 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>False</td><td>29.77 ms</td><td>1.003 ms</td><td>2.814 ms</td><td>28.58 ms</td><td>0.79</td><td>0.30</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>True</td><td>161.93 ms</td><td>3.505 ms</td><td>10.336 ms</td><td>156.88 ms</td><td>4.14</td><td>0.31</td>
+</tr><tr><td>FileStream_Read</td><td>16384</td><td>True</td><td>41.63 ms</td><td>0.650 ms</td><td>0.507 ms</td><td>41.63 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>True</td><td>65.46 ms</td><td>1.297 ms</td><td>2.928 ms</td><td>65.31 ms</td><td>1.59</td><td>0.10</td>
+</tr></tbody></table>
+</body>
+</html>
