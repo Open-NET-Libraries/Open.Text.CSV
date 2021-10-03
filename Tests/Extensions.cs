@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Toolkit.HighPerformance.Buffers;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Open.Text.CSV.Test;
 
@@ -96,5 +99,48 @@ public static class Extensions
 				.ConfigureAwait(continueOnCapturedContext: false);
 		}
 		while (!readResult.IsCompleted);
+	}
+
+	public static async IAsyncEnumerable<ArrayPoolBufferWriter<char>> DecodeAsync(
+		this IAsyncEnumerable<ReadOnlySequence<byte>> source,
+		Decoder decoder = default,
+		int initialBufferSize = 4096,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		decoder ??= Encoding.UTF8.GetDecoder();
+
+		using var decodedBlock = new ArrayPoolBufferWriter<char>(initialCapacity: initialBufferSize);
+
+		await foreach (var encodedBlock in source
+			.WithCancellation(cancellationToken)
+			.ConfigureAwait(false))
+		{
+			bool isDecodingCompleted;
+
+			do
+			{
+				decoder.Convert(
+					bytes: in encodedBlock,
+					charsUsed: out _,
+					completed: out isDecodingCompleted,
+					flush: false,
+					writer: decodedBlock
+				);
+
+				yield return decodedBlock;
+
+				decodedBlock.Clear();
+			} while (!isDecodingCompleted && !cancellationToken.IsCancellationRequested);
+		}
+
+		decoder.Convert(
+			bytes: in ReadOnlySequence<byte>.Empty,
+			charsUsed: out var numberOfCharsUsed,
+			completed: out _,
+			flush: true,
+			writer: decodedBlock);
+
+		if (0 < numberOfCharsUsed)
+			yield return decodedBlock;
 	}
 }

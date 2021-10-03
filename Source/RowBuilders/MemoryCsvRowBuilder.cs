@@ -29,7 +29,7 @@ public sealed class MemoryCsvRowBuilder
 
 	protected override void AddNextChar(in char c, bool ws = false)
 	{
-		_fb.Append(c);
+		_ = _fb.Append(c);
 		if (!ws) FieldLen = _fb.Length;
 	}
 
@@ -38,13 +38,13 @@ public sealed class MemoryCsvRowBuilder
 		if (FieldLen == 0)
 		{
 			_fields.Add(string.Empty);
-			if (_fb.Length != 0) _fb.Clear();
+			if (_fb.Length != 0) _ = _fb.Clear();
 			return;
 		}
 
 		if (FieldLen < _fb.Length) _fb.Length = FieldLen;
 		_fields.Add(_stringPool.GetOrAdd(_fb.ToString()));
-		_fb.Clear();
+		_ = _fb.Clear();
 		FieldLen = 0;
 	}
 
