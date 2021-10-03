@@ -9,29 +9,22 @@ using Xunit;
 namespace Open.Text.CSV.Test;
 
 [MemoryDiagnoser]
-public class CsvFileReadTests
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Some benchmarks are disabled (commented out).")]
+
+public class CsvFileReadTests : TextReaderBenchmarkBase
 {
 	public static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
-	const int BENCH_ROWS = 100000; // ExpectedLineCount;
-
-	[Params(BENCH_ROWS)]
-	public int MaxRows { get; set; } = ExpectedLineCount;
 
 	const int ROW_BUFFER = -1;
 
-	internal const string TEST_DATA_CSV = "TestData.csv";
-
-	static readonly IList<IList<string>> Data = CsvReader.GetAllRowsFromFile(TEST_DATA_CSV);
+	static readonly IList<IList<string>> Data = CsvReader.GetAllRowsFromFile(TEST_FILE);
 
 	[Benchmark(Baseline = true)]
 	public int CsvReader_GetAllRowsFromFile()
 	{
 		int count = 0;
-		using var sr = new FileInfo(TEST_DATA_CSV).OpenText();
-		foreach (var _ in CsvReader.ReadRows(sr))
-		{
-			if (++count == MaxRows) break;
-		}
+		foreach (var _ in CsvReader.ReadRows(Reader))
+			count++;
 		return count;
 	}
 
@@ -39,28 +32,27 @@ public class CsvFileReadTests
 	public int CsvMemoryReader_GetAllRowsFromFile()
 	{
 		int count = 0;
-		using var sr = new FileInfo(TEST_DATA_CSV).OpenText();
-		using var csv = new CsvMemoryReader(sr);
+		using var csv = new CsvMemoryReader(Reader);
 		foreach (var row in csv.ReadRows())
 		{
 			row.Dispose();
-			if (++count == MaxRows) break;
+			count++;
 		}
+
 		return count;
 	}
 
 	[Fact]
 
-	public void CsvReader_GetAllRowsFromFileTest()
-		=> Assert.Equal(ExpectedLineCount, CsvReader_GetAllRowsFromFile());
+	public void CsvReader_GetAllRowsFromFileTest() => Run(() =>
+		Assert.Equal(ExpectedLineCount, CsvReader_GetAllRowsFromFile()));
 
 	[Fact]
 
-	public void CsvMemoryReader_GetAllRowsFromFileTest()
+	public void CsvMemoryReader_GetAllRowsFromFileTest() => Run(() =>
 	{
 		var rows = new List<List<string>>();
-		using var sr = new FileInfo(TEST_DATA_CSV).OpenText();
-		using var csv = new CsvMemoryReader(sr);
+		using var csv = new CsvMemoryReader(Reader);
 		foreach (var row in csv.ReadRows())
 		{
 			var list = new List<string>(csv.MaxFields);
@@ -69,19 +61,23 @@ public class CsvFileReadTests
 			row.Dispose();
 			rows.Add(list);
 		}
+
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
+	});
 
 	//[Benchmark]
 	public List<List<string>> Sylvan_GetAllRowsFromFile()
 	{
 		var count = 0;
 		var rows = new List<List<string>>();
-		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV, new Sylvan.Data.Csv.CsvDataReaderOptions
-		{
-			HasHeaders = false
-		});
+		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(
+			TEST_FILE,
+			new Sylvan.Data.Csv.CsvDataReaderOptions
+			{
+				HasHeaders = false
+			});
+
 		var fields = reader.FieldCount;
 		while (reader.Read())
 		{
@@ -89,25 +85,26 @@ public class CsvFileReadTests
 			for (var i = 0; i < fields; i++)
 				row.Add(reader.GetString(i));
 			rows.Add(row);
-			if (++count == MaxRows) break;
+			count++;
 		}
+
 		return rows;
 	}
 
 	[Fact]
-	public void Sylvan_GetAllRowsFromFileTest()
+	public void Sylvan_GetAllRowsFromFileTest() => Run(() =>
 	{
 		var rows = Sylvan_GetAllRowsFromFile();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
+	});
 
 	//[Benchmark]
 	public List<Record> Sylvan_GetAllRowsFromFile_StrongType()
 	{
 		var count = 0;
 		var rows = new List<Record>();
-		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_DATA_CSV);
+		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_FILE);
 		var fields = reader.FieldCount;
 		while (reader.Read())
 		{
@@ -126,14 +123,15 @@ public class CsvFileReadTests
 				PrevRefSubNets = reader.GetInt32(10),
 				PrevRefIPs = reader.GetInt32(11)
 			});
-			if (++count == MaxRows) break;
+			count++;
 		}
+
 		return rows;
 	}
 
 	[Fact]
-	public void Sylvan_GetAllRowsFromFileTest_StrongType()
-		=> Assert.Equal(ExpectedLineCount - 1, Sylvan_GetAllRowsFromFile_StrongType().Count);
+	public void Sylvan_GetAllRowsFromFileTest_StrongType() => Run(() =>
+	   Assert.Equal(ExpectedLineCount - 1, Sylvan_GetAllRowsFromFile_StrongType().Count));
 
 	public class Record
 	{
@@ -154,93 +152,88 @@ public class CsvFileReadTests
 	//[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_GetAllRowsFromFileAsync()
 	{
-		var count = 0;
 		var list = new List<IList<string>>();
 		IList<string> row;
 
-		var fs = new FileStream(TEST_DATA_CSV, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
-		var sr = new StreamReader(fs);
-		var csv = new CsvReader(sr);
+		var csv = new CsvReader(Reader);
 		while ((row = await csv.ReadNextRowAsync().ConfigureAwait(false)) is not null)
-		{
 			list.Add(row);
-			if (++count == MaxRows) break;
-		}
 		return list;
 	}
 
 	[Fact]
-	public async Task CsvReader_GetAllRowsFromFileAsyncTest()
+	public Task CsvReader_GetAllRowsFromFileAsyncTest() => RunAsync(async () =>
 	{
 		var rows = await CsvReader_GetAllRowsFromFileAsync();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
+	});
+
 
 	//[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsToChannel()
 	{
 		var rows = new List<IList<string>>();
-		using var canceller = new CancellationTokenSource();
-		await CsvReader.ReadRowsToChannel(TEST_DATA_CSV, ROW_BUFFER).ReadUntilCancelled(canceller.Token, (row, i) =>
-		{
-			rows.Add(row);
-			if (i == MaxRows) canceller.Cancel();
-		});
+		_ = await CsvReader.ReadRowsToChannel(TEST_FILE, ROW_BUFFER)
+			.ReadAll(rows.Add);
 		return rows;
 	}
 
 	[Fact]
-	public async Task CsvReader_ReadRowsToChannelTest()
+	public Task CsvReader_ReadRowsToChannelTest() => RunAsync(async () =>
 	{
 		var rows = await CsvReader_ReadRowsToChannel();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
+	});
 
 	//[Benchmark]
 	public IList<IList<string>> CsvReader_ReadRowsBuffered()
 	{
-		int count = 0;
 		var rows = new List<IList<string>>();
-		using var fs = new FileInfo(TEST_DATA_CSV).OpenRead();
-		using var sr = new StreamReader(fs);
-		foreach (var row in CsvReader.ReadRowsBuffered(sr, ROW_BUFFER))
-		{
+		foreach (var row in CsvReader.ReadRowsBuffered(Reader, ROW_BUFFER))
 			rows.Add(row);
-			if (++count == MaxRows) break;
-		}
 		return rows;
 	}
 
 	[Fact]
-	public void CsvReader_ReadRowsBufferedTest()
+	public void CsvReader_ReadRowsBufferedTest() => Run(() =>
 	{
 		var rows = CsvReader_ReadRowsBuffered();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
+	});
 
 	//[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsBufferedAsync()
 	{
-		var count = 0;
 		var rows = new List<IList<string>>();
-		using var fs = new FileStream(TEST_DATA_CSV, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
-		using var sr = new StreamReader(fs);
-		await foreach (var row in CsvReader.ReadRowsBufferedAsync(sr, ROW_BUFFER))
-		{
+		await foreach (var row in CsvReader.ReadRowsBufferedAsync(Reader, ROW_BUFFER))
 			rows.Add(row);
-			if (++count == MaxRows) break;
-		}
 		return rows;
 	}
 
 	[Fact]
-	public async Task CsvReader_ReadRowsBufferedAsyncTest()
+	public Task CsvReader_ReadRowsBufferedAsyncTest() => RunAsync(async () =>
 	{
 		var rows = await CsvReader_ReadRowsBufferedAsync();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
+	});
+
+	[Benchmark]
+	public async Task<int> CsvReader_PipeRowsAsync()
+	{
+		int count = 0;
+		await foreach (var row in CsvReader.PipeRowsAsync(Stream))
+			count++;
+		return count;
 	}
+
+	[Fact]
+	public Task CsvReader_PipeRowsAsyncTest() => RunAsync(async () =>
+	{
+		var count = await CsvReader_PipeRowsAsync();
+		Assert.Equal(ExpectedLineCount, count);
+	});
 }

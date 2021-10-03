@@ -16,10 +16,7 @@ public class CsvWriter : IDisposable
 		_target = target ?? throw new ArgumentNullException(nameof(target));
 	}
 
-	public void Dispose()
-	{
-		_target = null; // The intention here is if this object is disposed, then prevent further writing.
-	}
+	public void Dispose() => _target = null; // The intention here is if this object is disposed, then prevent further writing.
 
 	public void WriteRow<T>(IEnumerable<T> row, bool forceQuotes = false)
 		=> WriteRow(Target, row, forceQuotes);

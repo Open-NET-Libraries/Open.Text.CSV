@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
@@ -52,20 +53,21 @@ public class CsvReader<TRow> : IDisposable
 		}
 
 	loop:
-		c = s.Read(buffer, 0, buffer.Length);
+		c = s.Read(buffer!, 0, buffer!.Length);
 		if (c == 0)
 		{
 			EndReached = true;
 			pool.Return(buffer, true);
 			return _rowBuilder.EndRow() ? _rowBuilder.LatestCompleteRow : default;
 		}
+
 		_remaining = new ArraySegment<char>(buffer, 0, c);
 
 	add:
 		if (_rowBuilder.Add(in _remaining, out _remaining))
 		{
 			if (_remaining.Count == 0)
-				pool.Return(buffer, true);
+				pool.Return(buffer!, true);
 			return _rowBuilder.LatestCompleteRow;
 		}
 
@@ -94,20 +96,21 @@ public class CsvReader<TRow> : IDisposable
 		}
 
 	loop:
-		c = await s.ReadAsync(buffer, 0, buffer.Length);
+		c = await s.ReadAsync(buffer!, 0, buffer!.Length);
 		if (c == 0)
 		{
 			EndReached = true;
 			pool.Return(buffer, true);
 			return _rowBuilder.EndRow() ? _rowBuilder.LatestCompleteRow : default;
 		}
+
 		_remaining = new ArraySegment<char>(buffer, 0, c);
 
 	add:
 		if (_rowBuilder.Add(in _remaining, out _remaining))
 		{
 			if (_remaining.Count == 0)
-				pool.Return(buffer, true);
+				pool.Return(buffer!, true);
 			return _rowBuilder.LatestCompleteRow;
 		}
 
@@ -146,6 +149,7 @@ public class CsvReader<TRow> : IDisposable
 			writer.Complete();
 			return;
 		}
+
 		await Task.Yield();
 		var pool = ArrayPool<char>.Shared;
 		var cNext = pool.Rent(charBufferSize);
@@ -153,7 +157,7 @@ public class CsvReader<TRow> : IDisposable
 		var source = Source;
 		try
 		{
-#if NETSTANDARD2_1_OR_GREATER
+#if BUFFERS
 			var next = source.ReadAsync(cNext, cancellationToken);
 #else
 			var next = source.ReadAsync(cNext, 0, cNext.Length);
@@ -167,7 +171,7 @@ public class CsvReader<TRow> : IDisposable
 			}
 
 			// Preemptive request.
-#if NETSTANDARD2_1_OR_GREATER
+#if BUFFERS
 			var current = source.ReadAsync(cCurrent, cancellationToken);
 #else
 			var current = source.ReadAsync(cCurrent, 0, cCurrent.Length);
@@ -246,7 +250,7 @@ public class CsvReader<TRow> : IDisposable
 	}
 
 
-#if NETSTANDARD2_1_OR_GREATER
+#if ASYNC_ENUMERABLE
 
 	public async IAsyncEnumerable<TRow> ReadRowsAsync()
 	{
@@ -405,8 +409,7 @@ public sealed class CsvReader : CsvReader<IList<string>>
 		return rowBuffer.Reader;
 	}
 
-#if NETSTANDARD2_1_OR_GREATER
-
+#if ASYNC_ENUMERABLE
 	public static async IAsyncEnumerable<IList<string>> ReadRowsBufferedAsync(
 		TextReader source,
 		int rowBufferCount = 3,
@@ -416,6 +419,26 @@ public sealed class CsvReader : CsvReader<IList<string>>
 		using var reader = new CsvReader(source);
 		await foreach (var row in reader.ReadRowsBufferedAsync(rowBufferCount, charBufferSize, cancellationToken))
 			yield return row;
+	}
+#endif
+
+#if BUFFERWRITER_DECODE
+	public static async IAsyncEnumerable<Memory<string>> PipeRowsAsync(
+		Stream source,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var rowBuilder = new MemoryCsvRowBuilder();
+		await foreach(var bufferWriter in PipeReader.Create(source)
+			.EnumerateAsync(cancellationToken)
+			.DecodeAsync(cancellationToken: cancellationToken))
+		{
+			var chunk = bufferWriter.WrittenMemory;
+			while(rowBuilder.Add(chunk, out chunk))
+			{
+				using var mem = rowBuilder.LatestCompleteRow!;
+				yield return mem.Memory;
+			}
+		}
 	}
 #endif
 
@@ -507,8 +530,7 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 		return rowBuffer.Reader;
 	}
 
-#if NETSTANDARD2_1_OR_GREATER
-
+#if ASYNC_ENUMERABLE
 	public static async IAsyncEnumerable<IMemoryOwner<string>> ReadRowsBufferedAsync(
 		TextReader source,
 		int rowBufferCount = 3,

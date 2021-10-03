@@ -18,6 +18,7 @@ public class PipelineBenchmarks : FileReadBenchmarkBase
 		{
 			count += sequence.Length;
 		}
+
 		return count;
 	}
 }

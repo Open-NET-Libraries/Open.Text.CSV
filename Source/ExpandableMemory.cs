@@ -24,11 +24,13 @@ public class ExpandableMemory<T> : IDisposable
 		if (Length == Capacity)
 		{
 			checked { Capacity *= 2; }
+
 			var newMemory = MemoryOwner<T>.Allocate(Capacity);
 			_owner.Memory.CopyTo(newMemory.Memory);
 			_owner.Dispose();
 			_owner = newMemory;
 		}
+
 		_owner.Span[Length] = value;
 		Length++;
 	}

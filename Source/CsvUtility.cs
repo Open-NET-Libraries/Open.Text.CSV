@@ -13,31 +13,31 @@ public static class CsvUtility
 	{
 		if (value is null)
 			return string.Empty;
-#if NETSTANDARD2_1_OR_GREATER
-			return '"' + value.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
-#else
+#if NETSTANDARD2_0
 		return '"' + value.Replace("\"", "\"\"") + '"';
+#else
+		return '"' + value.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
 #endif
 	}
 
 	public static string FormatValue(string value, bool forceQuotes = false)
-	{
-		if (value is null)
-			return string.Empty;
-
-		if (!string.IsNullOrEmpty(value) && forceQuotes || QUOTESNEEDED.IsMatch(value))
-			return WrapQuotes(value);
-
-		return value;
-	}
+		=> value is null || value.Length == 0
+		? string.Empty
+		: forceQuotes || QUOTESNEEDED.IsMatch(value)
+		? WrapQuotes(value)
+		: value;
 
 	public static string ExportValue(object? value, bool forceQuotes = false)
-		=> FormatValue(value switch
+	{
+		if (value is null) return ",";
+		var v = value switch
 		{
 			DateTime datetime => datetime.TimeOfDay == TimeSpan.Zero ?
 				datetime.ToString("d", CultureInfo.InvariantCulture) : // Use short date.
 				datetime.ToString(CultureInfo.InvariantCulture),
-			_ => value is null ? string.Empty : value.ToString(),
-		}, forceQuotes) + ",";
+			_ => value.ToString(),
+		};
 
+		return $"{FormatValue(v!, forceQuotes)},";
+	}
 }

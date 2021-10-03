@@ -16,6 +16,7 @@ public class StringBuilderVsMemoryOwner
 		{
 			_sb.Append(i);
 		}
+
 		var result = _sb.ToString();
 		_sb.Clear();
 		return result;
@@ -28,6 +29,7 @@ public class StringBuilderVsMemoryOwner
 		{
 			_em.Add(i);
 		}
+
 		var result = _em.Span.ToString();
 		_em.Clear();
 		return result;

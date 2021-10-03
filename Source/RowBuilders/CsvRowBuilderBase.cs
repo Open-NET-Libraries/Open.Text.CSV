@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 
@@ -82,6 +83,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 						AddNextChar(in c);
 						return false;
 				}
+
 				break;
 
 			case State.InField:
@@ -111,6 +113,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 						AddNextChar(in c);
 						return false;
 				}
+
 				break;
 
 			case State.InQuotedField:
@@ -150,6 +153,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 						ResetFieldBuffer();
 						throw new InvalidDataException(CORRUPT_FIELD);
 				}
+
 				break;
 
 			case State.AfterQuotedField:
@@ -173,6 +177,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 					default:
 						throw new InvalidDataException(CORRUPT_FIELD);
 				}
+
 				break;
 
 			case State.EndOfRow:
@@ -181,7 +186,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 				break;
 		}
 
-		Debug.Assert(c == -1 || c == '\n');
+		Debug.Assert(c == '\n');
 		return Complete();
 	}
 
@@ -208,7 +213,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 			if (AddChar(in c))
 			{
 				var n = offset + i + 1;
-				remaining = n == end ? default : new ArraySegment<char>(a, n, end - n);
+				remaining = n == end ? default : new ArraySegment<char>(a!, n, end - n);
 				return true;
 			}
 		}

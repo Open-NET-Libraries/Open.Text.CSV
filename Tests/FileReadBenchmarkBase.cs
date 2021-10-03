@@ -7,7 +7,7 @@ namespace Open.Text.CSV.Test;
 
 public abstract class FileReadBenchmarkBase
 {
-	protected const string TEST_FILE = CsvFileReadTests.TEST_DATA_CSV;
+	protected const string TEST_FILE = "TestData.csv";
 	protected static FileStream GetStream(int bufferSize, bool useAsync = false) => new(
 		TEST_FILE,
 		FileMode.Open,
@@ -50,31 +50,24 @@ public abstract class FileReadBenchmarkBase
 		Cleanup();
 	}
 
-	protected async Task Run(Func<Task> test)
+	protected T Run<T>(Func<T> test)
+	{
+		Setup(); 
+		try
+		{
+			return test();
+		}
+		finally
+		{
+			Cleanup();
+		}
+	}
+
+	protected async Task RunAsync(Func<Task> test)
 	{
 		Setup();
 		await test();
 		Cleanup();
 	}
 
-
-	[Benchmark(Baseline = true)]
-	public int FileStream_Read()
-	{
-		var count = 0;
-		int next;
-		while ((next = Stream.Read(ByteBuffer)) is not 0)
-			count += next;
-		return count;
-	}
-
-	[Benchmark]
-	public async Task<int> FileStream_ReadAsync()
-	{
-		var count = 0;
-		int next;
-		while ((next = await Stream.ReadAsync(ByteBuffer).ConfigureAwait(false)) is not 0)
-			count += next;
-		return count;
-	}
 }

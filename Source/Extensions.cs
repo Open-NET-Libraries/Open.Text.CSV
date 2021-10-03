@@ -9,10 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Open.Text.CSV.Test;
+namespace Open.Text.CSV;
 
 public static class Extensions
 {
+#if ASYNC_ENUMERABLE
 
 	public static async IAsyncEnumerable<ReadOnlyMemory<char>> SingleBufferReadAsync(
 		this TextReader reader,
@@ -100,10 +101,12 @@ public static class Extensions
 		}
 		while (!readResult.IsCompleted);
 	}
+#endif
 
+#if BUFFERWRITER_DECODE
 	public static async IAsyncEnumerable<ArrayPoolBufferWriter<char>> DecodeAsync(
 		this IAsyncEnumerable<ReadOnlySequence<byte>> source,
-		Decoder decoder = default,
+		Decoder? decoder = default,
 		int initialBufferSize = 4096,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
@@ -143,4 +146,5 @@ public static class Extensions
 		if (0 < numberOfCharsUsed)
 			yield return decodedBlock;
 	}
+#endif
 }
