@@ -8,8 +8,11 @@ namespace Open.Text.CSV.Test.Benchmarks
 		{
 			//BenchmarkRunner.Run<StringBuilderVsMemoryOwner>();
 			//BenchmarkRunner.Run<CsvFileReadTests>();
-			BenchmarkRunner.Run<FileReadMethodBenchmarks>();
+			//BenchmarkRunner.Run<TextReaderBenchmarks>();
 			//BenchmarkRunner.Run<CsvFileParallelReadTests>();
+			
+			BenchmarkRunner.Run<PipelineBenchmarks>();
+
 		}
 	}
 }

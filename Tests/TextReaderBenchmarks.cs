@@ -6,66 +6,33 @@ using Xunit;
 
 namespace Open.Text.CSV.Test
 {
-	public class FileReadMethodBenchmarks
+	public class TextReaderBenchmarks : FileReadBenchmarkBase
 	{
-		protected const string TEST_FILE = CsvFileReadTests.TEST_DATA_CSV;
-
-		[Params(1024, 4096, 16384)]
-		public int BufferSize { get; set; } = 4096;
-
-		[Params(true, false)]
-		public bool UseAsync { get; set; } = false;
-
-		FileStream GetStream() => new(
-			TEST_FILE,
-			FileMode.Open,
-			FileAccess.Read,
-			FileShare.Read,
-			BufferSize,
-			UseAsync);
-
-		FileStream Stream;
-		StreamReader Reader;
-		char[] Buffer;
+		protected StreamReader Reader { get; private set; }
+		protected char[] CharBuffer { get; private set; }
 
 		[IterationSetup]
-		public void Setup()
+		public override void Setup()
 		{
-			Stream = GetStream();
+			base.Setup();
 			Reader = new StreamReader(Stream);
-			Buffer = new char[BufferSize];
+			CharBuffer = new char[BufferSize];
 		}
 
 		[IterationCleanup]
-		public void Cleanup()
+		public override void Cleanup()
 		{
 			Reader.Dispose();
-			Stream.Dispose();
-			Reader = null;
-			Stream = null;
-			Buffer = null;
+			CharBuffer = null;
+			base.Cleanup();
 		}
 
-		protected void Run(Action test)
-		{
-			Setup();
-			test();
-			Cleanup();
-		}
-
-		protected async Task Run(Func<Task> test)
-		{
-			Setup();
-			await test();
-			Cleanup();
-		}
-
-		[Benchmark(Baseline = true)]
+		[Benchmark]
 		public int StreamReader_Read()
 		{
 			var count = 0;
 			int next;
-			while ((next = Reader.Read(Buffer)) is not 0)
+			while ((next = Reader.Read(CharBuffer)) is not 0)
 				count += next;
 			return count;
 		}
@@ -75,7 +42,7 @@ namespace Open.Text.CSV.Test
 		{
 			var count = 0;
 			int next;
-			while ((next = await Reader.ReadAsync(Buffer).ConfigureAwait(false)) is not 0)
+			while ((next = await Reader.ReadAsync(CharBuffer).ConfigureAwait(false)) is not 0)
 				count += next;
 			return count;
 		}
@@ -126,7 +93,7 @@ namespace Open.Text.CSV.Test
 		}
 	}
 
-	public class FileReadMethodTests : FileReadMethodBenchmarks
+	public class FileReadMethodTests : TextReaderBenchmarks
 	{
 		static readonly int ExpectedCharacterCount = GetExpectedCharacterCount();
 
