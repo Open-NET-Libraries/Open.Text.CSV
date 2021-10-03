@@ -12,7 +12,6 @@ namespace Open.Text.CSV.Test
 		protected StreamReader Reader { get; private set; }
 		protected char[] CharBuffer { get; private set; }
 
-		[IterationSetup]
 		public override void Setup()
 		{
 			base.Setup();
@@ -20,7 +19,6 @@ namespace Open.Text.CSV.Test
 			CharBuffer = new char[BufferSize];
 		}
 
-		[IterationCleanup]
 		public override void Cleanup()
 		{
 			Reader.Dispose();
