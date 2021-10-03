@@ -120,22 +120,21 @@ public class CsvReader<TRow> : IDisposable
 			yield return rowBuffer!;
 	}
 
-	protected static Channel<T> CreateRowBuffer<T>(int maxRows)
+	protected static Channel<T> CreateRowBuffer<T>(int maxRows) => maxRows switch
 	{
-		if (maxRows == 0) throw new ArgumentException("Cannot be zero.", nameof(maxRows));
-		if (maxRows < -1) throw new ArgumentOutOfRangeException(nameof(maxRows), maxRows, "Cannot be less than -1.");
-		return maxRows == -1
-			? Channel.CreateUnbounded<T>(new UnboundedChannelOptions()
-			{
-				SingleWriter = true,
-				AllowSynchronousContinuations = true
-			})
-			: Channel.CreateBounded<T>(new BoundedChannelOptions(maxRows)
-			{
-				SingleWriter = true,
-				AllowSynchronousContinuations = true
-			});
-	}
+		0 => throw new ArgumentException("Cannot be zero.", nameof(maxRows)),
+		< -1 => throw new ArgumentOutOfRangeException(nameof(maxRows), maxRows, "Cannot be less than -1."),
+		-1 => Channel.CreateUnbounded<T>(new UnboundedChannelOptions()
+		{
+			SingleWriter = true,
+			AllowSynchronousContinuations = true
+		}),
+		_ => Channel.CreateBounded<T>(new BoundedChannelOptions(maxRows)
+		{
+			SingleWriter = true,
+			AllowSynchronousContinuations = true
+		})
+	};
 
 	public async ValueTask ReadRowsToChannelAsync(
 		ChannelWriter<TRow> writer,
