@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Open.Text.CSV.Test.TextReader_FileReadMethodBenchmarks-20211002-100920</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1237 (21H1/May2021Update)
+AMD Ryzen 5 4500U with Radeon Graphics, 1 CPU, 6 logical and 6 physical cores
+.NET SDK=6.0.100-rc.1.21463.6
+  [Host]     : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+  Job-SUXGDZ : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+</code></pre>
+<pre><code>InvocationCount=1  UnrollFactor=1  
+</code></pre>
+
+<table>
+<thead><tr><th>                        Method</th><th>BufferSize</th><th>UseAsync</th><th>Preload</th><th> Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th>
+</tr>
+</thead><tbody><tr><td>StreamReader_Read</td><td>1024</td><td>False</td><td>False</td><td>227.74 ms</td><td>27.298 ms</td><td>80.489 ms</td><td>194.14 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>1024</td><td>False</td><td>False</td><td>239.83 ms</td><td>2.420 ms</td><td>2.021 ms</td><td>239.93 ms</td><td>0.96</td><td>0.32</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>1024</td><td>False</td><td>False</td><td>346.22 ms</td><td>44.428 ms</td><td>130.996 ms</td><td>251.93 ms</td><td>1.65</td><td>0.73</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>1024</td><td>False</td><td>False</td><td>504.51 ms</td><td>9.948 ms</td><td>17.160 ms</td><td>507.49 ms</td><td>2.56</td><td>0.72</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>1024</td><td>False</td><td>False</td><td>275.23 ms</td><td>5.382 ms</td><td>8.691 ms</td><td>273.52 ms</td><td>1.38</td><td>0.38</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>1024</td><td>False</td><td>False</td><td>289.73 ms</td><td>5.754 ms</td><td>16.135 ms</td><td>286.64 ms</td><td>1.40</td><td>0.45</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>1024</td><td>False</td><td>False</td><td>539.29 ms</td><td>10.612 ms</td><td>20.697 ms</td><td>534.99 ms</td><td>2.69</td><td>0.77</td>
+</tr><tr><td>StreamReader_Read</td><td>1024</td><td>False</td><td>True</td><td>19.87 ms</td><td>0.618 ms</td><td>1.753 ms</td><td>20.24 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>1024</td><td>False</td><td>True</td><td>22.62 ms</td><td>0.877 ms</td><td>2.586 ms</td><td>23.43 ms</td><td>1.14</td><td>0.17</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>1024</td><td>False</td><td>True</td><td>111.38 ms</td><td>15.939 ms</td><td>46.997 ms</td><td>80.63 ms</td><td>5.80</td><td>2.72</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>1024</td><td>False</td><td>True</td><td>133.67 ms</td><td>19.453 ms</td><td>57.358 ms</td><td>92.98 ms</td><td>6.53</td><td>3.07</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>1024</td><td>False</td><td>True</td><td>31.14 ms</td><td>0.841 ms</td><td>2.479 ms</td><td>31.84 ms</td><td>1.58</td><td>0.20</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>1024</td><td>False</td><td>True</td><td>32.73 ms</td><td>0.614 ms</td><td>0.683 ms</td><td>32.85 ms</td><td>1.83</td><td>0.19</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>1024</td><td>False</td><td>True</td><td>247.96 ms</td><td>32.159 ms</td><td>94.821 ms</td><td>241.99 ms</td><td>12.49</td><td>4.86</td>
+</tr><tr><td>StreamReader_Read</td><td>1024</td><td>True</td><td>False</td><td>450.48 ms</td><td>3.284 ms</td><td>2.742 ms</td><td>449.98 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>1024</td><td>True</td><td>False</td><td>726.67 ms</td><td>13.968 ms</td><td>13.719 ms</td><td>728.54 ms</td><td>1.61</td><td>0.03</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>1024</td><td>True</td><td>False</td><td>550.77 ms</td><td>7.707 ms</td><td>7.209 ms</td><td>552.02 ms</td><td>1.22</td><td>0.01</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>1024</td><td>True</td><td>False</td><td>1,060.87 ms</td><td>21.208 ms</td><td>18.800 ms</td><td>1,061.77 ms</td><td>2.35</td><td>0.05</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>1024</td><td>True</td><td>False</td><td>789.71 ms</td><td>9.310 ms</td><td>8.253 ms</td><td>791.35 ms</td><td>1.75</td><td>0.02</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>1024</td><td>True</td><td>False</td><td>763.41 ms</td><td>11.926 ms</td><td>11.156 ms</td><td>759.10 ms</td><td>1.69</td><td>0.02</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>1024</td><td>True</td><td>False</td><td>1,145.81 ms</td><td>16.262 ms</td><td>15.212 ms</td><td>1,139.77 ms</td><td>2.55</td><td>0.04</td>
+</tr><tr><td>StreamReader_Read</td><td>1024</td><td>True</td><td>True</td><td>18.54 ms</td><td>0.557 ms</td><td>1.616 ms</td><td>18.47 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>1024</td><td>True</td><td>True</td><td>23.99 ms</td><td>0.472 ms</td><td>0.840 ms</td><td>24.08 ms</td><td>1.30</td><td>0.13</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>1024</td><td>True</td><td>True</td><td>79.85 ms</td><td>1.240 ms</td><td>1.160 ms</td><td>79.96 ms</td><td>4.17</td><td>0.29</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>1024</td><td>True</td><td>True</td><td>152.44 ms</td><td>22.569 ms</td><td>66.544 ms</td><td>105.49 ms</td><td>8.27</td><td>3.88</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>1024</td><td>True</td><td>True</td><td>30.38 ms</td><td>1.506 ms</td><td>4.440 ms</td><td>32.20 ms</td><td>1.65</td><td>0.29</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>1024</td><td>True</td><td>True</td><td>32.23 ms</td><td>0.881 ms</td><td>2.598 ms</td><td>32.86 ms</td><td>1.75</td><td>0.21</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>1024</td><td>True</td><td>True</td><td>142.73 ms</td><td>4.145 ms</td><td>10.774 ms</td><td>139.90 ms</td><td>7.78</td><td>0.86</td>
+</tr><tr><td>StreamReader_Read</td><td>4096</td><td>False</td><td>False</td><td>115.59 ms</td><td>13.377 ms</td><td>39.441 ms</td><td>125.26 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>4096</td><td>False</td><td>False</td><td>105.93 ms</td><td>2.104 ms</td><td>5.544 ms</td><td>104.88 ms</td><td>1.12</td><td>0.44</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>4096</td><td>False</td><td>False</td><td>230.58 ms</td><td>30.521 ms</td><td>89.991 ms</td><td>169.13 ms</td><td>2.36</td><td>1.49</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>4096</td><td>False</td><td>False</td><td>526.81 ms</td><td>55.101 ms</td><td>162.466 ms</td><td>474.56 ms</td><td>5.55</td><td>3.43</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>4096</td><td>False</td><td>False</td><td>115.40 ms</td><td>3.702 ms</td><td>10.501 ms</td><td>112.00 ms</td><td>1.19</td><td>0.52</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>4096</td><td>False</td><td>False</td><td>118.98 ms</td><td>3.646 ms</td><td>10.750 ms</td><td>117.72 ms</td><td>1.20</td><td>0.53</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>4096</td><td>False</td><td>False</td><td>879.92 ms</td><td>17.528 ms</td><td>30.699 ms</td><td>875.04 ms</td><td>11.62</td><td>3.49</td>
+</tr><tr><td>StreamReader_Read</td><td>4096</td><td>False</td><td>True</td><td>16.11 ms</td><td>0.566 ms</td><td>1.643 ms</td><td>16.46 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>4096</td><td>False</td><td>True</td><td>17.04 ms</td><td>0.754 ms</td><td>2.211 ms</td><td>17.53 ms</td><td>1.07</td><td>0.16</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>4096</td><td>False</td><td>True</td><td>139.06 ms</td><td>19.153 ms</td><td>56.472 ms</td><td>151.67 ms</td><td>8.64</td><td>3.69</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>4096</td><td>False</td><td>True</td><td>165.36 ms</td><td>20.677 ms</td><td>60.967 ms</td><td>148.01 ms</td><td>10.34</td><td>3.76</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>4096</td><td>False</td><td>True</td><td>19.98 ms</td><td>0.423 ms</td><td>1.215 ms</td><td>20.14 ms</td><td>1.25</td><td>0.17</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>4096</td><td>False</td><td>True</td><td>20.40 ms</td><td>0.595 ms</td><td>1.716 ms</td><td>20.54 ms</td><td>1.28</td><td>0.19</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>4096</td><td>False</td><td>True</td><td>128.68 ms</td><td>1.505 ms</td><td>1.175 ms</td><td>128.40 ms</td><td>8.36</td><td>0.91</td>
+</tr><tr><td>StreamReader_Read</td><td>4096</td><td>True</td><td>False</td><td>203.84 ms</td><td>29.458 ms</td><td>86.857 ms</td><td>138.46 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>4096</td><td>True</td><td>False</td><td>254.93 ms</td><td>2.936 ms</td><td>2.603 ms</td><td>255.22 ms</td><td>0.97</td><td>0.24</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>4096</td><td>True</td><td>False</td><td>434.48 ms</td><td>47.137 ms</td><td>138.984 ms</td><td>457.22 ms</td><td>2.48</td><td>1.23</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>4096</td><td>True</td><td>False</td><td>1,012.33 ms</td><td>20.028 ms</td><td>29.357 ms</td><td>1,009.47 ms</td><td>3.46</td><td>0.79</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>4096</td><td>True</td><td>False</td><td>376.37 ms</td><td>42.929 ms</td><td>126.576 ms</td><td>375.63 ms</td><td>1.96</td><td>0.58</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>4096</td><td>True</td><td>False</td><td>375.56 ms</td><td>49.026 ms</td><td>144.555 ms</td><td>277.88 ms</td><td>1.95</td><td>0.54</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>4096</td><td>True</td><td>False</td><td>1,076.73 ms</td><td>20.847 ms</td><td>22.306 ms</td><td>1,079.91 ms</td><td>3.97</td><td>0.96</td>
+</tr><tr><td>StreamReader_Read</td><td>4096</td><td>True</td><td>True</td><td>15.68 ms</td><td>0.571 ms</td><td>1.666 ms</td><td>16.17 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>4096</td><td>True</td><td>True</td><td>17.25 ms</td><td>0.537 ms</td><td>1.540 ms</td><td>17.60 ms</td><td>1.11</td><td>0.17</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>4096</td><td>True</td><td>True</td><td>166.58 ms</td><td>16.760 ms</td><td>49.418 ms</td><td>175.72 ms</td><td>10.76</td><td>3.58</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>4096</td><td>True</td><td>True</td><td>178.28 ms</td><td>25.951 ms</td><td>76.517 ms</td><td>142.21 ms</td><td>11.63</td><td>5.39</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>4096</td><td>True</td><td>True</td><td>17.36 ms</td><td>0.782 ms</td><td>2.307 ms</td><td>17.80 ms</td><td>1.11</td><td>0.18</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>4096</td><td>True</td><td>True</td><td>21.13 ms</td><td>0.411 ms</td><td>0.849 ms</td><td>21.08 ms</td><td>1.38</td><td>0.18</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>4096</td><td>True</td><td>True</td><td>200.48 ms</td><td>28.136 ms</td><td>82.960 ms</td><td>134.08 ms</td><td>13.04</td><td>5.62</td>
+</tr><tr><td>StreamReader_Read</td><td>16384</td><td>False</td><td>False</td><td>75.14 ms</td><td>2.007 ms</td><td>5.727 ms</td><td>76.84 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>16384</td><td>False</td><td>False</td><td>172.37 ms</td><td>2.225 ms</td><td>2.081 ms</td><td>172.67 ms</td><td>2.64</td><td>0.70</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>16384</td><td>False</td><td>False</td><td>229.03 ms</td><td>25.641 ms</td><td>75.605 ms</td><td>256.06 ms</td><td>3.10</td><td>1.16</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>16384</td><td>False</td><td>False</td><td>527.44 ms</td><td>1.879 ms</td><td>1.666 ms</td><td>527.50 ms</td><td>8.16</td><td>2.13</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>16384</td><td>False</td><td>False</td><td>188.46 ms</td><td>2.543 ms</td><td>2.379 ms</td><td>187.89 ms</td><td>2.89</td><td>0.77</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>16384</td><td>False</td><td>False</td><td>182.75 ms</td><td>1.440 ms</td><td>1.276 ms</td><td>183.09 ms</td><td>2.83</td><td>0.75</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>16384</td><td>False</td><td>False</td><td>602.12 ms</td><td>3.414 ms</td><td>3.194 ms</td><td>602.52 ms</td><td>9.22</td><td>2.39</td>
+</tr><tr><td>StreamReader_Read</td><td>16384</td><td>False</td><td>True</td><td>17.11 ms</td><td>0.555 ms</td><td>1.600 ms</td><td>17.43 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>16384</td><td>False</td><td>True</td><td>17.40 ms</td><td>0.471 ms</td><td>1.360 ms</td><td>17.72 ms</td><td>1.03</td><td>0.13</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>16384</td><td>False</td><td>True</td><td>155.51 ms</td><td>19.381 ms</td><td>57.145 ms</td><td>173.36 ms</td><td>9.33</td><td>3.40</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>16384</td><td>False</td><td>True</td><td>191.37 ms</td><td>24.672 ms</td><td>72.746 ms</td><td>219.12 ms</td><td>11.46</td><td>4.58</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>16384</td><td>False</td><td>True</td><td>17.22 ms</td><td>0.758 ms</td><td>2.236 ms</td><td>17.87 ms</td><td>1.02</td><td>0.18</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>16384</td><td>False</td><td>True</td><td>18.61 ms</td><td>0.384 ms</td><td>1.114 ms</td><td>18.77 ms</td><td>1.10</td><td>0.12</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>16384</td><td>False</td><td>True</td><td>228.05 ms</td><td>34.995 ms</td><td>103.183 ms</td><td>147.09 ms</td><td>13.71</td><td>6.46</td>
+</tr><tr><td>StreamReader_Read</td><td>16384</td><td>True</td><td>False</td><td>54.31 ms</td><td>1.060 ms</td><td>1.340 ms</td><td>54.15 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>16384</td><td>True</td><td>False</td><td>185.98 ms</td><td>9.900 ms</td><td>29.191 ms</td><td>199.75 ms</td><td>3.42</td><td>0.55</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>16384</td><td>True</td><td>False</td><td>227.71 ms</td><td>29.600 ms</td><td>87.277 ms</td><td>198.90 ms</td><td>3.71</td><td>1.39</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>16384</td><td>True</td><td>False</td><td>226.45 ms</td><td>2.009 ms</td><td>1.879 ms</td><td>226.34 ms</td><td>4.17</td><td>0.11</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>16384</td><td>True</td><td>False</td><td>217.49 ms</td><td>4.318 ms</td><td>10.592 ms</td><td>218.87 ms</td><td>3.96</td><td>0.35</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>16384</td><td>True</td><td>False</td><td>193.25 ms</td><td>1.971 ms</td><td>1.843 ms</td><td>193.62 ms</td><td>3.56</td><td>0.10</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>16384</td><td>True</td><td>False</td><td>561.03 ms</td><td>31.500 ms</td><td>92.877 ms</td><td>538.10 ms</td><td>12.01</td><td>1.62</td>
+</tr><tr><td>StreamReader_Read</td><td>16384</td><td>True</td><td>True</td><td>18.16 ms</td><td>0.809 ms</td><td>2.386 ms</td><td>18.45 ms</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>StreamReader_ReadAsync</td><td>16384</td><td>True</td><td>True</td><td>16.64 ms</td><td>0.699 ms</td><td>2.062 ms</td><td>17.06 ms</td><td>0.94</td><td>0.21</td>
+</tr><tr><td>StreamReader_ReadLine</td><td>16384</td><td>True</td><td>True</td><td>166.34 ms</td><td>18.508 ms</td><td>54.570 ms</td><td>180.05 ms</td><td>9.14</td><td>2.82</td>
+</tr><tr><td>StreamReader_ReadLineAsync</td><td>16384</td><td>True</td><td>True</td><td>184.06 ms</td><td>20.781 ms</td><td>61.273 ms</td><td>201.98 ms</td><td>10.35</td><td>3.86</td>
+</tr><tr><td>StreamReader_SingleBufferReadAsync</td><td>16384</td><td>True</td><td>True</td><td>18.54 ms</td><td>0.664 ms</td><td>1.959 ms</td><td>19.01 ms</td><td>1.04</td><td>0.19</td>
+</tr><tr><td>StreamReader_DualBufferReadAsync</td><td>16384</td><td>True</td><td>True</td><td>19.02 ms</td><td>0.394 ms</td><td>1.149 ms</td><td>19.08 ms</td><td>1.07</td><td>0.18</td>
+</tr><tr><td>StreamReader_PreemptiveReadLineAsync</td><td>16384</td><td>True</td><td>True</td><td>264.09 ms</td><td>33.515 ms</td><td>98.820 ms</td><td>301.87 ms</td><td>15.06</td><td>6.68</td>
+</tr></tbody></table>
+</body>
+</html>
