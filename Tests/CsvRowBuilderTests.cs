@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using System.Buffers;
+using System.Collections.Generic;
+using Xunit;
 
 namespace Open.Text.CSV.Test;
 
@@ -8,35 +10,29 @@ public static class CsvRowBuilderTests
 	public static void BasicRowBuildTest()
 	{
 		var rb = new ListCsvRowBuilder();
-		rb.Add("\"A\", B, C,\r\n", out _);
-		var row = rb.LatestCompleteRow;
+		IList<string> row;
+		rb.Add("\"A\", B, C,\r\n", out _, out row);
 		Assert.Equal(3, row.Count);
 		Assert.Equal("C", row[2]);
 
-		rb.Add("D, \"E\", F\n", out _);
-		row = rb.LatestCompleteRow;
+		rb.Add("D, \"E\", F\n", out _, out row);
 		Assert.Equal(3, row.Count);
 		Assert.Equal("F", row[2]);
 
-		rb.Add("G, H, I", out _);
-		rb.EndRow();
-		row = rb.LatestCompleteRow;
+		rb.Add("G, H, I", out _, out _);
+		rb.EndRow(out row);
 		Assert.Equal(3, row.Count);
 		Assert.Equal("I", row[2]);
 
-		rb.Add("J, K, \"L\nX\"", out _);
-		rb.EndRow();
-		row = rb.LatestCompleteRow;
+		rb.Add("J, K, \"L\nX\"", out _, out _);
+		rb.EndRow(out row);
 		Assert.Equal(3, row.Count);
 		Assert.Equal("L\nX", row[2]);
 
-		rb.Add("L, M, N,\nO,P,Q", out var remaining);
-		row = rb.LatestCompleteRow;
+		rb.Add("L, M, N,\nO,P,Q", out var remaining, out row);
 		Assert.Equal(3, row.Count);
 		Assert.Equal("N", row[2]);
 		Assert.Equal(5, remaining.Length);
-
-
 	}
 
 
@@ -44,30 +40,31 @@ public static class CsvRowBuilderTests
 	public static void BasicRowBuildTest2()
 	{
 		var rb = new MemoryCsvRowBuilder();
-		rb.Add("\"A\", B, C,\r\n", out _);
-		var row = rb.LatestCompleteRow.Memory.Span;
+		IMemoryOwner<string> mem;
+		rb.Add("\"A\", B, C,\r\n", out _, out mem);
+		var row = mem.Memory.Span;
 		Assert.Equal(3, row.Length);
 		Assert.Equal("C", row[2]);
 
-		rb.Add("D, \"E\", F\n", out _);
-		row = rb.LatestCompleteRow.Memory.Span;
+		rb.Add("D, \"E\", F\n", out _, out mem);
+		row = mem.Memory.Span;
 		Assert.Equal(3, row.Length);
 		Assert.Equal("F", row[2]);
 
-		rb.Add("G, H, I", out _);
-		rb.EndRow();
-		row = rb.LatestCompleteRow.Memory.Span;
+		rb.Add("G, H, I", out _, out _);
+		rb.EndRow(out mem);
+		row = mem.Memory.Span;
 		Assert.Equal(3, row.Length);
 		Assert.Equal("I", row[2]);
 
-		rb.Add("J, K, \"L\nX\"", out _);
-		rb.EndRow();
-		row = rb.LatestCompleteRow.Memory.Span;
+		rb.Add("J, K, \"L\nX\"", out _, out mem);
+		rb.EndRow(out mem);
+		row = mem.Memory.Span;
 		Assert.Equal(3, row.Length);
 		Assert.Equal("L\nX", row[2]);
 
-		rb.Add("L, M, N,\nO,P,Q", out var remaining);
-		row = rb.LatestCompleteRow.Memory.Span;
+		rb.Add("L, M, N,\nO,P,Q", out var remaining, out mem);
+		row = mem.Memory.Span;
 		Assert.Equal(3, row.Length);
 		Assert.Equal("N", row[2]);
 		Assert.Equal(5, remaining.Length);

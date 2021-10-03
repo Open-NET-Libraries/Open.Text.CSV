@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Open.Text.CSV;
@@ -15,8 +15,6 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	State _state = State.BeforeField;
 	protected int FieldLen = 0;
 	public int MaxFields { get; protected set; }
-
-	public TRow? LatestCompleteRow { get; protected set; }
 
 	/// <summary>
 	/// Resets the row builder to the beginning of a row.
@@ -35,7 +33,11 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// </summary>
 	/// <returns>true if a new row is emitted; otherwise false.</returns>
 	/// <exception cref="InvalidDataException">If called in the middle of a quoted field.</exception>
-	public bool EndRow()
+	public bool EndRow(
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
 	{
 		switch (_state)
 		{
@@ -49,11 +51,16 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 				throw new InvalidDataException("When the line ends with a quoted field, the last character should be an unescaped double quote.");
 		}
 
-		return Complete();
+		return Complete(out row);
 	}
 
-	private bool AddChar(in char c)
+	private bool AddChar(in char c,
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
 	{
+		row = default;
 		switch (_state)
 		{
 			case State.BeforeField:
@@ -187,7 +194,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 		}
 
 		Debug.Assert(c == '\n');
-		return Complete();
+		return Complete(out row);
 	}
 
 	/// <summary>
@@ -199,7 +206,11 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// If there are not enough to complete a row, an empty segment is returned.
 	/// </param>
 	/// <returns>true if a new row is emitted; otherwise false.</returns>
-	public bool Add(in ArraySegment<char> chars, out ArraySegment<char> remaining)
+	public bool Add(in ArraySegment<char> chars, out ArraySegment<char> remaining,
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
 	{
 		var a = chars.Array;
 		var len = chars.Count;
@@ -210,7 +221,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 		for (var i = 0; i < len; i++)
 		{
 			ref readonly char c = ref span[i];
-			if (AddChar(in c))
+			if (AddChar(in c, out row))
 			{
 				var n = offset + i + 1;
 				remaining = n == end ? default : new ArraySegment<char>(a!, n, end - n);
@@ -218,6 +229,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 			}
 		}
 
+		row = default;
 		remaining = default;
 		return false;
 	}
@@ -226,13 +238,17 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// Takes all the characters in an ReadOnlySpan and attemtps to add them to the row.
 	/// </summary>
 	/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
-	public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining)
+	public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining,
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
 	{
 		var len = chars.Length;
 		for (var i = 0; i < len; i++)
 		{
 			ref readonly char c = ref chars[i];
-			if (AddChar(in c))
+			if (AddChar(in c, out row))
 			{
 				var n = i + 1;
 				remaining = n == chars.Length ? ReadOnlySpan<char>.Empty : chars.Slice(n);
@@ -240,6 +256,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 			}
 		}
 
+		row = default;
 		remaining = ReadOnlySpan<char>.Empty;
 		return false;
 	}
@@ -248,14 +265,18 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// Takes all the characters in an ReadOnlyMemory and attemtps to add them to the row.
 	/// </summary>
 	/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
-	public bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining)
+	public bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining,
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
 	{
 		var len = chars.Length;
 		var span = chars.Span;
 		for (var i = 0; i < len; i++)
 		{
 			ref readonly char c = ref span[i];
-			if (AddChar(in c))
+			if (AddChar(in c, out row))
 			{
 				var n = i + 1;
 				remaining = n == chars.Length ? ReadOnlyMemory<char>.Empty : chars.Slice(n);
@@ -263,6 +284,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 			}
 		}
 
+		row = default;
 		remaining = ReadOnlyMemory<char>.Empty;
 		return false;
 	}
@@ -271,14 +293,22 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// Takes all the characters in a string and attemtps to add them to the row.
 	/// </summary>
 	/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
-	public bool Add(string chars, out ReadOnlySpan<char> remaining)
-		=> Add(chars.AsSpan(), out remaining);
+	public bool Add(string chars, out ReadOnlySpan<char> remaining,
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row)
+		=> Add(chars.AsSpan(), out remaining, out row);
 
 	protected abstract void AddNextChar(in char c, bool ws = false);
 
 	protected abstract void AddEntry();
 
-	protected abstract bool Complete();
+	protected abstract bool Complete(
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out TRow? row);
 
 	enum State
 	{

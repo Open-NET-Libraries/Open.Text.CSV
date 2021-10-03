@@ -1,6 +1,6 @@
 ﻿using Microsoft.Toolkit.HighPerformance.Buffers;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Open.Text.CSV;
@@ -49,17 +49,30 @@ public sealed class ListCsvRowBuilder : CsvRowBuilderBase<IList<string>>
 		FieldLen = 0;
 	}
 
-	protected override bool Complete()
+	protected override bool Complete(
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out IList<string>? row)
 	{
 		var f = _fields;
 		Reset();
-		if (f is null) return false;
+		if (f is null)
+		{
+			row = default;
+			return false;
+		}
 
 		var count = f.Count;
-		if (count == 0) return false;
+		if (count == 0)
+		{
+			row = default;
+			return false;
+		}
+
 		if (count > MaxFields) MaxFields = count;
 
-		LatestCompleteRow = f;
+		row = f;
 		return true;
 	}
 

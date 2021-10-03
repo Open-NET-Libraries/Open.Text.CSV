@@ -1,7 +1,7 @@
 ﻿using Microsoft.Toolkit.HighPerformance.Buffers;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Open.Text.CSV;
@@ -10,13 +10,11 @@ namespace Open.Text.CSV;
 /// Receives characters in a CSV sequence and translates them into values in a row.
 /// </summary>
 public sealed class MemoryCsvRowBuilder
-	: CsvRowBuilderBase<IMemoryOwner<string>>, IDisposable, ICsvRowBuilder<IList<string>>
+	: CsvRowBuilderBase<IMemoryOwner<string>>, IDisposable
 {
 	readonly StringPool _stringPool = new();
 	readonly ExpandableMemory<string> _fields = new();
 	readonly StringBuilder _fb = new();
-
-	IList<string>? ICsvRowBuilder<IList<string>>.LatestCompleteRow => LatestCompleteRow?.Memory.ToArray();
 
 	/// <inheritdoc />
 	public override void Reset()
@@ -38,24 +36,33 @@ public sealed class MemoryCsvRowBuilder
 		if (FieldLen == 0)
 		{
 			_fields.Add(string.Empty);
-			if (_fb.Length != 0) _ = _fb.Clear();
+			if (_fb.Length != 0) _fb.Clear();
 			return;
 		}
 
 		if (FieldLen < _fb.Length) _fb.Length = FieldLen;
 		_fields.Add(_stringPool.GetOrAdd(_fb.ToString()));
-		_ = _fb.Clear();
+		_fb.Clear();
 		FieldLen = 0;
 	}
 
-	protected override bool Complete()
+	protected override bool Complete(
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+	out IMemoryOwner<string>? row)
 	{
 		try
 		{
 			var count = _fields.Length;
-			if (count == 0) return false;
+			if (count == 0)
+			{
+				row = default;
+				return false;
+			}
+
 			if (count > MaxFields) MaxFields = count;
-			LatestCompleteRow = _fields.ExtractOwner();
+			row = _fields.ExtractOwner();
 			return true;
 		}
 		finally

@@ -17,8 +17,8 @@ public abstract class FileReadBenchmarkBase
 		useAsync);
 
 
-	[Params(4096, 16384)]
-	public int BufferSize { get; set; } = 4096;
+	[Params(/*4096, */ 16384, 32768)]
+	public int BufferSize { get; set; } = 32768;
 
 	[Params(true, false)]
 	public bool UseAsync { get; set; } = false;

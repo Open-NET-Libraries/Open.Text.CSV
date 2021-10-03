@@ -24,8 +24,8 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageIcon>logo.png</PackageIcon>
-		<DefineConstants Condition="$(TargetFramework) == 'netstandard2.1'">BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;$(DefineConstants)</DefineConstants>
-		<DefineConstants Condition="$(TargetFramework) == 'net6.0'">BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;BUFFERWRITER_DECODE;$(DefineConstants)</DefineConstants>
+		<DefineConstants Condition="$(TargetFramework) == 'netstandard2.1'">NULL_ANALYSIS;BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;$(DefineConstants)</DefineConstants>
+		<DefineConstants Condition="$(TargetFramework) == 'net6.0'">NULL_ANALYSIS;BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;BUFFERWRITER_DECODE;$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

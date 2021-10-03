@@ -1,8 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Open.ChannelExtensions;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,7 +13,7 @@ public class CsvFileReadTests : TextReaderBenchmarkBase
 {
 	public static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
 
-	const int ROW_BUFFER = -1;
+	const int ROW_BUFFER = 100;
 
 	static readonly IList<IList<string>> Data = CsvReader.GetAllRowsFromFile(TEST_FILE);
 
@@ -204,7 +202,7 @@ public class CsvFileReadTests : TextReaderBenchmarkBase
 		Assert.Equal(Data, rows);
 	});
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsBufferedAsync()
 	{
 		var rows = new List<IList<string>>();
