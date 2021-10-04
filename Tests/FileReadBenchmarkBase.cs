@@ -32,11 +32,14 @@ public abstract class FileReadBenchmarkBase
 	protected FileStream Stream { get; private set; }
 	protected byte[] ByteBuffer { get; private set; }
 
+	protected Memory<byte> ByteBufferMemory { get; private set; }
+
 	[IterationSetup]
 	public virtual void Setup()
 	{
 		Stream = GetStream();
-		ByteBuffer = new byte[ByteBufferSize];
+		ByteBuffer = new byte[ByteBufferSize]; // Get the exact size for the benchmark.
+		ByteBufferMemory = new Memory<byte>(ByteBuffer);
 	}
 
 	[IterationCleanup]
@@ -45,6 +48,7 @@ public abstract class FileReadBenchmarkBase
 		Stream.Dispose();
 		Stream = null;
 		ByteBuffer = null;
+		ByteBufferMemory = Memory<byte>.Empty;
 	}
 
 	protected void Run(Action test)

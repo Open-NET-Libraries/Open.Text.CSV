@@ -15,7 +15,8 @@ public class PipelineBenchmarks : FileStreamReadBenchmark
 			.Create(Stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
 			.EnumerateAsync())
 		{
-			count += sequence.Length;
+			foreach (var mem in sequence)
+				count += mem.Length;
 		}
 
 		return count;

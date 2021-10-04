@@ -10,7 +10,7 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 	{
 		var count = 0;
 		int next;
-		while ((next = Stream.Read(ByteBuffer)) is not 0)
+		while ((next = Stream.Read(ByteBufferMemory.Span)) is not 0)
 			count += next;
 		return count;
 	}
@@ -20,7 +20,7 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 	{
 		var count = 0;
 		int next;
-		while ((next = await Stream.ReadAsync(ByteBuffer).ConfigureAwait(false)) is not 0)
+		while ((next = await Stream.ReadAsync(ByteBufferMemory).ConfigureAwait(false)) is not 0)
 			count += next;
 		return count;
 	}
@@ -29,9 +29,10 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 	public async Task<long> FileStream_EnumerateAsync()
 	{
 		long count = 0;
-		await foreach(var mem in Stream.EnumerateAsync(ByteBufferSize).ConfigureAwait(false))
+		await foreach(var sequence in Stream.EnumerateAsync(ByteBufferSize).ConfigureAwait(false))
 		{
-			count += mem.Length;
+			foreach(var mem in sequence)
+				count += mem.Length;
 		}
 		return count;
 	}
