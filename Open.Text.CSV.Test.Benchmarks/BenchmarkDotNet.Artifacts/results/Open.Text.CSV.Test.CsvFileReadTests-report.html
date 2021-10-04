@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Open.Text.CSV.Test.CsvFileReadTests-20211003-160432</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1237 (21H1/May2021Update)
+AMD Ryzen 5 4500U with Radeon Graphics, 1 CPU, 6 logical and 6 physical cores
+.NET SDK=6.0.100-rc.1.21463.6
+  [Host]     : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+  Job-LZETXR : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+</code></pre>
+<pre><code>InvocationCount=1  UnrollFactor=1  
+</code></pre>
+
+<table>
+<thead><tr><th>                      Method</th><th>BufferSize</th><th>UseAsync</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>CsvReader_GetAllRowsFromFile</td><td>16384</td><td>False</td><td>5.159 s</td><td>0.3866 s</td><td>1.1399 s</td><td>5.096 s</td><td>1.00</td><td>0.00</td><td>287000.0000</td><td>-</td><td>-</td><td>574 MB</td>
+</tr><tr><td>CsvMemoryReader_GetAllRowsFromFile</td><td>16384</td><td>False</td><td>4.795 s</td><td>0.3512 s</td><td>1.0243 s</td><td>4.593 s</td><td>0.98</td><td>0.32</td><td>252000.0000</td><td>-</td><td>-</td><td>505 MB</td>
+</tr><tr><td>CsvReader_ReadRowsBufferedAsync</td><td>16384</td><td>False</td><td>11.131 s</td><td>0.5835 s</td><td>1.7206 s</td><td>11.841 s</td><td>2.25</td><td>0.55</td><td>97000.0000</td><td>33000.0000</td><td>1000.0000</td><td>591 MB</td>
+</tr><tr><td>CsvReader_PipeRowsAsync</td><td>16384</td><td>False</td><td>9.853 s</td><td>0.4253 s</td><td>1.2540 s</td><td>10.296 s</td><td>2.02</td><td>0.59</td><td>130000.0000</td><td>65000.0000</td><td>19000.0000</td><td>643 MB</td>
+</tr><tr><td>CsvReader_GetAllRowsFromFile</td><td>16384</td><td>True</td><td>6.021 s</td><td>0.3870 s</td><td>1.1411 s</td><td>6.222 s</td><td>1.00</td><td>0.00</td><td>287000.0000</td><td>-</td><td>-</td><td>575 MB</td>
+</tr><tr><td>CsvMemoryReader_GetAllRowsFromFile</td><td>16384</td><td>True</td><td>7.223 s</td><td>0.3959 s</td><td>1.1674 s</td><td>7.369 s</td><td>1.25</td><td>0.32</td><td>253000.0000</td><td>-</td><td>-</td><td>506 MB</td>
+</tr><tr><td>CsvReader_ReadRowsBufferedAsync</td><td>16384</td><td>True</td><td>11.603 s</td><td>0.5664 s</td><td>1.6702 s</td><td>12.203 s</td><td>2.00</td><td>0.50</td><td>97000.0000</td><td>33000.0000</td><td>1000.0000</td><td>591 MB</td>
+</tr><tr><td>CsvReader_PipeRowsAsync</td><td>16384</td><td>True</td><td>8.974 s</td><td>0.6146 s</td><td>1.8120 s</td><td>9.260 s</td><td>1.54</td><td>0.42</td><td>122000.0000</td><td>61000.0000</td><td>20000.0000</td><td>640 MB</td>
+</tr><tr><td>CsvReader_GetAllRowsFromFile</td><td>32768</td><td>False</td><td>3.747 s</td><td>0.2340 s</td><td>0.6900 s</td><td>3.712 s</td><td>1.00</td><td>0.00</td><td>286000.0000</td><td>-</td><td>-</td><td>574 MB</td>
+</tr><tr><td>CsvMemoryReader_GetAllRowsFromFile</td><td>32768</td><td>False</td><td>3.740 s</td><td>0.2027 s</td><td>0.5913 s</td><td>3.527 s</td><td>1.03</td><td>0.25</td><td>252000.0000</td><td>-</td><td>-</td><td>505 MB</td>
+</tr><tr><td>CsvReader_ReadRowsBufferedAsync</td><td>32768</td><td>False</td><td>6.614 s</td><td>0.3223 s</td><td>0.9452 s</td><td>6.605 s</td><td>1.82</td><td>0.43</td><td>97000.0000</td><td>34000.0000</td><td>1000.0000</td><td>590 MB</td>
+</tr><tr><td>CsvReader_PipeRowsAsync</td><td>32768</td><td>False</td><td>7.160 s</td><td>0.3483 s</td><td>1.0270 s</td><td>7.351 s</td><td>1.96</td><td>0.40</td><td>129000.0000</td><td>64000.0000</td><td>18000.0000</td><td>641 MB</td>
+</tr><tr><td>CsvReader_GetAllRowsFromFile</td><td>32768</td><td>True</td><td>3.482 s</td><td>0.1803 s</td><td>0.5316 s</td><td>3.333 s</td><td>1.00</td><td>0.00</td><td>287000.0000</td><td>-</td><td>-</td><td>574 MB</td>
+</tr><tr><td>CsvMemoryReader_GetAllRowsFromFile</td><td>32768</td><td>True</td><td>3.756 s</td><td>0.1437 s</td><td>0.4170 s</td><td>3.672 s</td><td>1.11</td><td>0.19</td><td>252000.0000</td><td>-</td><td>-</td><td>505 MB</td>
+</tr><tr><td>CsvReader_ReadRowsBufferedAsync</td><td>32768</td><td>True</td><td>6.899 s</td><td>0.3092 s</td><td>0.9116 s</td><td>6.712 s</td><td>2.02</td><td>0.40</td><td>97000.0000</td><td>33000.0000</td><td>1000.0000</td><td>590 MB</td>
+</tr><tr><td>CsvReader_PipeRowsAsync</td><td>32768</td><td>True</td><td>6.057 s</td><td>0.1566 s</td><td>0.4594 s</td><td>6.095 s</td><td>1.78</td><td>0.28</td><td>121000.0000</td><td>60000.0000</td><td>19000.0000</td><td>639 MB</td>
+</tr></tbody></table>
+</body>
+</html>

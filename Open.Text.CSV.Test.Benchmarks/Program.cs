@@ -8,10 +8,10 @@ class Program
 	{
 		//BenchmarkRunner.Run<StringBuilderVsMemoryOwner>();
 		//BenchmarkRunner.Run<CsvFileReadTests>();
-		//BenchmarkRunner.Run<TextReaderBenchmarks>();
+		BenchmarkRunner.Run<TextReaderBenchmarks>();
 		//BenchmarkRunner.Run<CsvFileParallelReadTests>();
 
-		BenchmarkRunner.Run<PipelineBenchmarks>();
+		//BenchmarkRunner.Run<PipelineBenchmarks>();
 
 	}
 }

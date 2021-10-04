@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>Open.Text.CSV.Test.PipelineBenchmarks-20211003-093651</title>
+<title>Open.Text.CSV.Test.PipelineBenchmarks-20211004-050149</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
@@ -17,26 +17,46 @@ BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1237 (21H1/May2021Update)
 AMD Ryzen 5 4500U with Radeon Graphics, 1 CPU, 6 logical and 6 physical cores
 .NET SDK=6.0.100-rc.1.21463.6
   [Host]     : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
-  Job-QYBRXV : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+  Job-AWAMQO : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
 </code></pre>
 <pre><code>InvocationCount=1  UnrollFactor=1  
 </code></pre>
 
 <table>
-<thead><tr><th>             Method</th><th>BufferSize</th><th>UseAsync</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th>
+<thead><tr><th>             Method</th><th>FileStreamBufferSize</th><th>UseAsync</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>PipeReader_EnumerateAsync</td><td>4096</td><td>False</td><td>343.94 ms</td><td>6.701 ms</td><td>10.233 ms</td><td>346.01 ms</td><td>3.99</td><td>1.45</td>
-</tr><tr><td>FileStream_Read</td><td>4096</td><td>False</td><td>88.62 ms</td><td>9.660 ms</td><td>28.484 ms</td><td>101.81 ms</td><td>1.00</td><td>0.00</td>
-</tr><tr><td>FileStream_ReadAsync</td><td>4096</td><td>False</td><td>70.00 ms</td><td>0.991 ms</td><td>0.878 ms</td><td>69.94 ms</td><td>0.70</td><td>0.22</td>
-</tr><tr><td>PipeReader_EnumerateAsync</td><td>4096</td><td>True</td><td>242.94 ms</td><td>4.764 ms</td><td>9.180 ms</td><td>243.31 ms</td><td>0.90</td><td>0.20</td>
-</tr><tr><td>FileStream_Read</td><td>4096</td><td>True</td><td>249.27 ms</td><td>21.865 ms</td><td>64.468 ms</td><td>267.99 ms</td><td>1.00</td><td>0.00</td>
-</tr><tr><td>FileStream_ReadAsync</td><td>4096</td><td>True</td><td>212.42 ms</td><td>4.229 ms</td><td>7.294 ms</td><td>212.61 ms</td><td>0.78</td><td>0.18</td>
-</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>False</td><td>128.58 ms</td><td>8.079 ms</td><td>23.820 ms</td><td>126.84 ms</td><td>3.34</td><td>1.25</td>
-</tr><tr><td>FileStream_Read</td><td>16384</td><td>False</td><td>41.74 ms</td><td>3.632 ms</td><td>10.710 ms</td><td>43.46 ms</td><td>1.00</td><td>0.00</td>
-</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>False</td><td>29.77 ms</td><td>1.003 ms</td><td>2.814 ms</td><td>28.58 ms</td><td>0.79</td><td>0.30</td>
-</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>True</td><td>161.93 ms</td><td>3.505 ms</td><td>10.336 ms</td><td>156.88 ms</td><td>4.14</td><td>0.31</td>
-</tr><tr><td>FileStream_Read</td><td>16384</td><td>True</td><td>41.63 ms</td><td>0.650 ms</td><td>0.507 ms</td><td>41.63 ms</td><td>1.00</td><td>0.00</td>
-</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>True</td><td>65.46 ms</td><td>1.297 ms</td><td>2.928 ms</td><td>65.31 ms</td><td>1.59</td><td>0.10</td>
+</thead><tbody><tr><td>PipeReader_EnumerateAsync</td><td>1</td><td>False</td><td>116.00 ms</td><td>2.240 ms</td><td>3.140 ms</td><td>115.46 ms</td><td>4.86</td><td>0.18</td><td>1,103,496 B</td>
+</tr><tr><td>FileStream_Read</td><td>1</td><td>False</td><td>23.85 ms</td><td>0.379 ms</td><td>0.506 ms</td><td>23.89 ms</td><td>1.00</td><td>0.00</td><td>480 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>1</td><td>False</td><td>27.70 ms</td><td>0.537 ms</td><td>1.145 ms</td><td>27.55 ms</td><td>1.19</td><td>0.06</td><td>1,400 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>1</td><td>False</td><td>71.46 ms</td><td>2.236 ms</td><td>6.594 ms</td><td>72.05 ms</td><td>2.95</td><td>0.25</td><td>2,120 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>1</td><td>True</td><td>170.35 ms</td><td>3.050 ms</td><td>4.175 ms</td><td>170.07 ms</td><td>2.16</td><td>0.75</td><td>1,087,544 B</td>
+</tr><tr><td>FileStream_Read</td><td>1</td><td>True</td><td>82.57 ms</td><td>7.081 ms</td><td>20.878 ms</td><td>86.22 ms</td><td>1.00</td><td>0.00</td><td>1,085,088 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>1</td><td>True</td><td>137.13 ms</td><td>3.275 ms</td><td>9.554 ms</td><td>139.20 ms</td><td>1.82</td><td>0.64</td><td>1,288 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>1</td><td>True</td><td>141.64 ms</td><td>2.596 ms</td><td>2.302 ms</td><td>141.69 ms</td><td>2.16</td><td>0.68</td><td>2,296 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>8192</td><td>False</td><td>76.81 ms</td><td>10.013 ms</td><td>29.524 ms</td><td>68.62 ms</td><td>2.09</td><td>1.16</td><td>1,103,296 B</td>
+</tr><tr><td>FileStream_Read</td><td>8192</td><td>False</td><td>40.74 ms</td><td>4.081 ms</td><td>12.033 ms</td><td>44.95 ms</td><td>1.00</td><td>0.00</td><td>480 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>8192</td><td>False</td><td>32.64 ms</td><td>0.653 ms</td><td>1.613 ms</td><td>32.19 ms</td><td>0.84</td><td>0.32</td><td>1,488 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>8192</td><td>False</td><td>115.21 ms</td><td>1.457 ms</td><td>1.363 ms</td><td>115.56 ms</td><td>3.64</td><td>1.29</td><td>1,920 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>8192</td><td>True</td><td>149.64 ms</td><td>2.745 ms</td><td>2.938 ms</td><td>149.35 ms</td><td>1.60</td><td>0.14</td><td>1,102,248 B</td>
+</tr><tr><td>FileStream_Read</td><td>8192</td><td>True</td><td>75.81 ms</td><td>9.132 ms</td><td>26.925 ms</td><td>86.93 ms</td><td>1.00</td><td>0.00</td><td>1,085,088 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>8192</td><td>True</td><td>137.14 ms</td><td>2.714 ms</td><td>4.225 ms</td><td>137.60 ms</td><td>1.63</td><td>0.44</td><td>1,664 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>8192</td><td>True</td><td>142.03 ms</td><td>3.898 ms</td><td>11.494 ms</td><td>143.12 ms</td><td>2.21</td><td>0.98</td><td>2,384 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>False</td><td>120.46 ms</td><td>2.360 ms</td><td>3.150 ms</td><td>120.18 ms</td><td>3.41</td><td>1.18</td><td>1,102,792 B</td>
+</tr><tr><td>FileStream_Read</td><td>16384</td><td>False</td><td>36.80 ms</td><td>4.063 ms</td><td>11.980 ms</td><td>39.73 ms</td><td>1.00</td><td>0.00</td><td>480 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>False</td><td>30.93 ms</td><td>0.972 ms</td><td>2.759 ms</td><td>29.75 ms</td><td>0.95</td><td>0.31</td><td>1,488 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>16384</td><td>False</td><td>83.66 ms</td><td>1.668 ms</td><td>3.996 ms</td><td>84.30 ms</td><td>2.57</td><td>0.87</td><td>1,920 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>16384</td><td>True</td><td>167.15 ms</td><td>3.310 ms</td><td>4.954 ms</td><td>167.91 ms</td><td>2.43</td><td>0.75</td><td>1,103,472 B</td>
+</tr><tr><td>FileStream_Read</td><td>16384</td><td>True</td><td>79.66 ms</td><td>8.335 ms</td><td>24.575 ms</td><td>84.47 ms</td><td>1.00</td><td>0.00</td><td>1,085,088 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>16384</td><td>True</td><td>64.42 ms</td><td>0.874 ms</td><td>1.956 ms</td><td>64.25 ms</td><td>1.05</td><td>0.39</td><td>1,664 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>16384</td><td>True</td><td>163.66 ms</td><td>3.266 ms</td><td>8.941 ms</td><td>168.59 ms</td><td>2.44</td><td>1.03</td><td>2,384 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>32768</td><td>False</td><td>97.12 ms</td><td>1.760 ms</td><td>1.560 ms</td><td>97.34 ms</td><td>2.20</td><td>0.03</td><td>594,448 B</td>
+</tr><tr><td>FileStream_Read</td><td>32768</td><td>False</td><td>44.15 ms</td><td>0.350 ms</td><td>0.327 ms</td><td>44.11 ms</td><td>1.00</td><td>0.00</td><td>33,272 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>32768</td><td>False</td><td>78.86 ms</td><td>1.176 ms</td><td>1.100 ms</td><td>78.98 ms</td><td>1.79</td><td>0.03</td><td>34,280 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>32768</td><td>False</td><td>92.80 ms</td><td>0.943 ms</td><td>0.882 ms</td><td>92.87 ms</td><td>2.10</td><td>0.03</td><td>35,192 B</td>
+</tr><tr><td>PipeReader_EnumerateAsync</td><td>32768</td><td>True</td><td>101.88 ms</td><td>1.771 ms</td><td>1.570 ms</td><td>101.73 ms</td><td>1.51</td><td>0.13</td><td>594,512 B</td>
+</tr><tr><td>FileStream_Read</td><td>32768</td><td>True</td><td>63.00 ms</td><td>3.349 ms</td><td>9.874 ms</td><td>67.62 ms</td><td>1.00</td><td>0.00</td><td>575,936 B</td>
+</tr><tr><td>FileStream_ReadAsync</td><td>32768</td><td>True</td><td>80.96 ms</td><td>4.465 ms</td><td>13.167 ms</td><td>82.79 ms</td><td>1.35</td><td>0.46</td><td>34,456 B</td>
+</tr><tr><td>FileStream_EnumerateAsync</td><td>32768</td><td>True</td><td>102.78 ms</td><td>2.051 ms</td><td>2.361 ms</td><td>102.61 ms</td><td>1.55</td><td>0.15</td><td>35,176 B</td>
 </tr></tbody></table>
 </body>
 </html>

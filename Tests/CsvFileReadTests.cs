@@ -147,7 +147,7 @@ public class CsvFileReadTests : TextReaderBenchmarkBase
 		public int PrevRefIPs { get; set; }
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_GetAllRowsFromFileAsync()
 	{
 		var list = new List<IList<string>>();
