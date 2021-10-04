@@ -7,8 +7,8 @@ class Program
 	static void Main()
 	{
 		//BenchmarkRunner.Run<StringBuilderVsMemoryOwner>();
-		//BenchmarkRunner.Run<CsvFileReadTests>();
-		BenchmarkRunner.Run<TextReaderBenchmarks>();
+		BenchmarkRunner.Run<CsvFileReadTests>();
+		//BenchmarkRunner.Run<TextReaderBenchmarks>();
 		//BenchmarkRunner.Run<CsvFileParallelReadTests>();
 
 		//BenchmarkRunner.Run<PipelineBenchmarks>();
