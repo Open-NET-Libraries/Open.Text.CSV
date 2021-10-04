@@ -4,13 +4,16 @@ using System.IO.Pipelines;
 
 namespace Open.Text.CSV.Test;
 
-public class PipelineBenchmarks : FileReadBenchmarkBase
+[MemoryDiagnoser]
+public class PipelineBenchmarks : FileStreamReadBenchmark
 {
 	[Benchmark]
 	public async Task<long> PipeReader_EnumerateAsync()
 	{
 		long count = 0;
-		await foreach(var sequence in PipeReader.Create(Stream).EnumerateAsync())
+		await foreach(var sequence in PipeReader
+			.Create(Stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
+			.EnumerateAsync())
 		{
 			count += sequence.Length;
 		}

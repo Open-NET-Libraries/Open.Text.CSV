@@ -8,22 +8,26 @@ namespace Open.Text.CSV.Test;
 public abstract class FileReadBenchmarkBase
 {
 	protected const string TEST_FILE = "TestData.csv";
-	protected static FileStream GetStream(int bufferSize, bool useAsync = false) => new(
-		TEST_FILE,
-		FileMode.Open,
-		FileAccess.Read,
-		FileShare.Read,
-		bufferSize,
-		useAsync);
+	protected static FileStream GetStream(int bufferSize, bool useAsync = false)
+		=> new(TEST_FILE, new FileStreamOptions
+		{
+			Access = FileAccess.Read,
+			BufferSize = bufferSize,
+			Mode = FileMode.Open,
+			Options = (useAsync ? FileOptions.Asynchronous : FileOptions.None) | FileOptions.SequentialScan,
+			Share = FileShare.Read,
+		});
 
+	[Params(1, 8192, 16384, 32768)]
+	public int FileStreamBufferSize { get; set; } = 1;
 
-	[Params(/*4096, */ 16384, 32768)]
-	public int BufferSize { get; set; } = 32768;
+	[Params(1024, 4096, 16384)]
+	public int ByteBufferSize { get; set; } = 4096;
 
 	[Params(true, false)]
 	public bool UseAsync { get; set; } = false;
 
-	FileStream GetStream() => GetStream(BufferSize, UseAsync);
+	FileStream GetStream() => GetStream(FileStreamBufferSize, UseAsync);
 
 	protected FileStream Stream { get; private set; }
 	protected byte[] ByteBuffer { get; private set; }
@@ -32,7 +36,7 @@ public abstract class FileReadBenchmarkBase
 	public virtual void Setup()
 	{
 		Stream = GetStream();
-		ByteBuffer = new byte[BufferSize];
+		ByteBuffer = new byte[ByteBufferSize];
 	}
 
 	[IterationCleanup]

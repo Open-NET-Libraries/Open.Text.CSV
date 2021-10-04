@@ -11,7 +11,7 @@ public class TextReaderBenchmarkBase : FileReadBenchmarkBase
 	{
 		base.Setup();
 		Reader = new StreamReader(Stream);
-		CharBuffer = new char[BufferSize];
+		CharBuffer = new char[ByteBufferSize];
 	}
 
 	public override void Cleanup()

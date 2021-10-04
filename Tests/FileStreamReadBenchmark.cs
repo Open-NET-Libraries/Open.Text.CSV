@@ -24,4 +24,15 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 			count += next;
 		return count;
 	}
+
+	[Benchmark]
+	public async Task<long> FileStream_EnumerateAsync()
+	{
+		long count = 0;
+		await foreach(var mem in Stream.EnumerateAsync(ByteBufferSize).ConfigureAwait(false))
+		{
+			count += mem.Length;
+		}
+		return count;
+	}
 }

@@ -101,6 +101,34 @@ public static class Extensions
 		}
 		while (!readResult.IsCompleted);
 	}
+
+	public static async IAsyncEnumerable<ReadOnlySequence<byte>> EnumerateAsync(
+		this Stream stream,
+		int bufferSize = 4096,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+
+		var memory = bufferWriter.GetMemory(sizeHint: bufferSize);
+		var readResult = await stream
+			.ReadAsync(memory, cancellationToken)
+			.ConfigureAwait(continueOnCapturedContext: false);
+
+		if (0 < readResult)
+		{
+			do
+			{
+				bufferWriter.Advance(count: readResult);
+				yield return new ReadOnlySequence<byte>(bufferWriter.WrittenMemory);
+				bufferWriter.Clear();
+
+				readResult = await stream
+					.ReadAsync(memory, cancellationToken)
+					.ConfigureAwait(continueOnCapturedContext: false);
+			} while (0 < readResult);
+		}
+	}
+
 #endif
 
 #if BUFFERWRITER_DECODE

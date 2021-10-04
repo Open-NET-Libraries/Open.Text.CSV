@@ -65,7 +65,7 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 	public async Task<int> StreamReader_SingleBufferReadAsync()
 	{
 		var count = 0;
-		await foreach (var buffer in Reader.SingleBufferReadAsync(BufferSize))
+		await foreach (var buffer in Reader.SingleBufferReadAsync(FileStreamBufferSize))
 			count += buffer.Length;
 		return count;
 	}
@@ -74,7 +74,7 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 	public async Task<int> StreamReader_DualBufferReadAsync()
 	{
 		var count = 0;
-		await foreach (var buffer in Reader.DualBufferReadAsync(BufferSize))
+		await foreach (var buffer in Reader.DualBufferReadAsync(FileStreamBufferSize))
 			count += buffer.Length;
 		return count;
 	}
