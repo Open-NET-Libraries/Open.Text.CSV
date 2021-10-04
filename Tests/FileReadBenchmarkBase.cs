@@ -21,8 +21,8 @@ public abstract class FileReadBenchmarkBase
 	[Params(1, 8192, 16384, 32768)]
 	public int FileStreamBufferSize { get; set; } = 1;
 
-	[Params(1024, 4096, 16384)]
-	public int ByteBufferSize { get; set; } = 4096;
+	//[Params(1024, 4096, 16384)]
+	public int ByteBufferSize { get; set; } = 16384;
 
 	[Params(true, false)]
 	public bool UseAsync { get; set; } = false;
