@@ -4,29 +4,57 @@ BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1237 (21H1/May2021Update)
 AMD Ryzen 5 4500U with Radeon Graphics, 1 CPU, 6 logical and 6 physical cores
 .NET SDK=6.0.100-rc.1.21463.6
   [Host]     : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
-  Job-LZETXR : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
+  Job-KEGHXT : .NET 6.0.0 (6.0.21.45113), X64 RyuJIT
 
 InvocationCount=1  UnrollFactor=1  
 
 ```
-|                             Method | BufferSize | UseAsync |     Mean |    Error |   StdDev |   Median | Ratio | RatioSD |       Gen 0 |      Gen 1 |      Gen 2 | Allocated |
-|----------------------------------- |----------- |--------- |---------:|---------:|---------:|---------:|------:|--------:|------------:|-----------:|-----------:|----------:|
-|       **CsvReader_GetAllRowsFromFile** |      **16384** |    **False** |  **5.159 s** | **0.3866 s** | **1.1399 s** |  **5.096 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
-| CsvMemoryReader_GetAllRowsFromFile |      16384 |    False |  4.795 s | 0.3512 s | 1.0243 s |  4.593 s |  0.98 |    0.32 | 252000.0000 |          - |          - |    505 MB |
-|    CsvReader_ReadRowsBufferedAsync |      16384 |    False | 11.131 s | 0.5835 s | 1.7206 s | 11.841 s |  2.25 |    0.55 |  97000.0000 | 33000.0000 |  1000.0000 |    591 MB |
-|            CsvReader_PipeRowsAsync |      16384 |    False |  9.853 s | 0.4253 s | 1.2540 s | 10.296 s |  2.02 |    0.59 | 130000.0000 | 65000.0000 | 19000.0000 |    643 MB |
-|                                    |            |          |          |          |          |          |       |         |             |            |            |           |
-|       **CsvReader_GetAllRowsFromFile** |      **16384** |     **True** |  **6.021 s** | **0.3870 s** | **1.1411 s** |  **6.222 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **575 MB** |
-| CsvMemoryReader_GetAllRowsFromFile |      16384 |     True |  7.223 s | 0.3959 s | 1.1674 s |  7.369 s |  1.25 |    0.32 | 253000.0000 |          - |          - |    506 MB |
-|    CsvReader_ReadRowsBufferedAsync |      16384 |     True | 11.603 s | 0.5664 s | 1.6702 s | 12.203 s |  2.00 |    0.50 |  97000.0000 | 33000.0000 |  1000.0000 |    591 MB |
-|            CsvReader_PipeRowsAsync |      16384 |     True |  8.974 s | 0.6146 s | 1.8120 s |  9.260 s |  1.54 |    0.42 | 122000.0000 | 61000.0000 | 20000.0000 |    640 MB |
-|                                    |            |          |          |          |          |          |       |         |             |            |            |           |
-|       **CsvReader_GetAllRowsFromFile** |      **32768** |    **False** |  **3.747 s** | **0.2340 s** | **0.6900 s** |  **3.712 s** |  **1.00** |    **0.00** | **286000.0000** |          **-** |          **-** |    **574 MB** |
-| CsvMemoryReader_GetAllRowsFromFile |      32768 |    False |  3.740 s | 0.2027 s | 0.5913 s |  3.527 s |  1.03 |    0.25 | 252000.0000 |          - |          - |    505 MB |
-|    CsvReader_ReadRowsBufferedAsync |      32768 |    False |  6.614 s | 0.3223 s | 0.9452 s |  6.605 s |  1.82 |    0.43 |  97000.0000 | 34000.0000 |  1000.0000 |    590 MB |
-|            CsvReader_PipeRowsAsync |      32768 |    False |  7.160 s | 0.3483 s | 1.0270 s |  7.351 s |  1.96 |    0.40 | 129000.0000 | 64000.0000 | 18000.0000 |    641 MB |
-|                                    |            |          |          |          |          |          |       |         |             |            |            |           |
-|       **CsvReader_GetAllRowsFromFile** |      **32768** |     **True** |  **3.482 s** | **0.1803 s** | **0.5316 s** |  **3.333 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
-| CsvMemoryReader_GetAllRowsFromFile |      32768 |     True |  3.756 s | 0.1437 s | 0.4170 s |  3.672 s |  1.11 |    0.19 | 252000.0000 |          - |          - |    505 MB |
-|    CsvReader_ReadRowsBufferedAsync |      32768 |     True |  6.899 s | 0.3092 s | 0.9116 s |  6.712 s |  2.02 |    0.40 |  97000.0000 | 33000.0000 |  1000.0000 |    590 MB |
-|            CsvReader_PipeRowsAsync |      32768 |     True |  6.057 s | 0.1566 s | 0.4594 s |  6.095 s |  1.78 |    0.28 | 121000.0000 | 60000.0000 | 19000.0000 |    639 MB |
+|                             Method | FileStreamBufferSize | ByteBufferSize | UseAsync |     Mean |    Error |   StdDev |   Median | Ratio | RatioSD |       Gen 0 |      Gen 1 |      Gen 2 | Allocated |
+|----------------------------------- |--------------------- |--------------- |--------- |---------:|---------:|---------:|---------:|------:|--------:|------------:|-----------:|-----------:|----------:|
+|       **CsvReader_GetAllRowsFromFile** |                    **1** |           **8192** |    **False** |  **3.984 s** | **0.2019 s** | **0.5920 s** |  **3.970 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                    1 |           8192 |    False |  4.383 s | 0.2362 s | 0.6963 s |  4.212 s |  1.12 |    0.24 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                    1 |           8192 |    False | 12.118 s | 0.2292 s | 0.2729 s | 12.162 s |  2.95 |    0.38 |  98000.0000 | 33000.0000 |  1000.0000 |    596 MB |
+|    CsvReader_ReadRowsBufferedAsync |                    1 |           8192 |    False | 10.568 s | 0.4434 s | 1.3074 s | 10.871 s |  2.71 |    0.52 |  97000.0000 | 33000.0000 |  1000.0000 |    593 MB |
+|            CsvReader_PipeRowsAsync |                    1 |           8192 |    False |  7.762 s | 0.4946 s | 1.4506 s |  7.395 s |  1.98 |    0.42 | 121000.0000 | 60000.0000 | 20000.0000 |    646 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                    **1** |           **8192** |     **True** |  **6.816 s** | **0.3271 s** | **0.9646 s** |  **6.740 s** |  **1.00** |    **0.00** | **295000.0000** |          **-** |          **-** |    **590 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                    1 |           8192 |     True |  6.317 s | 0.4181 s | 1.2261 s |  6.200 s |  0.94 |    0.22 | 261000.0000 |          - |          - |    521 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                    1 |           8192 |     True | 11.418 s | 0.7109 s | 2.0960 s | 11.173 s |  1.72 |    0.44 |  98000.0000 | 33000.0000 |  1000.0000 |    596 MB |
+|    CsvReader_ReadRowsBufferedAsync |                    1 |           8192 |     True | 10.317 s | 0.5435 s | 1.6025 s | 10.941 s |  1.54 |    0.33 |  97000.0000 | 33000.0000 |  1000.0000 |    593 MB |
+|            CsvReader_PipeRowsAsync |                    1 |           8192 |     True | 10.733 s | 0.5019 s | 1.4799 s | 11.295 s |  1.61 |    0.34 | 136000.0000 | 68000.0000 | 19000.0000 |    647 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                    **1** |          **16384** |    **False** |  **5.607 s** | **0.4987 s** | **1.4705 s** |  **5.551 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                    1 |          16384 |    False |  5.897 s | 0.4101 s | 1.2093 s |  5.908 s |  1.11 |    0.34 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                    1 |          16384 |    False | 10.844 s | 0.6390 s | 1.8841 s | 11.588 s |  2.09 |    0.75 |  98000.0000 | 33000.0000 |  1000.0000 |    596 MB |
+|    CsvReader_ReadRowsBufferedAsync |                    1 |          16384 |    False | 10.562 s | 0.4244 s | 1.2515 s | 11.059 s |  2.04 |    0.68 |  97000.0000 | 33000.0000 |  1000.0000 |    593 MB |
+|            CsvReader_PipeRowsAsync |                    1 |          16384 |    False | 10.687 s | 0.2619 s | 0.7723 s | 10.955 s |  2.04 |    0.56 | 126000.0000 | 63000.0000 | 19000.0000 |    646 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                    **1** |          **16384** |     **True** |  **6.120 s** | **0.3992 s** | **1.1769 s** |  **6.050 s** |  **1.00** |    **0.00** | **295000.0000** |          **-** |          **-** |    **590 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                    1 |          16384 |     True |  7.134 s | 0.4023 s | 1.1861 s |  7.145 s |  1.22 |    0.35 | 261000.0000 |          - |          - |    521 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                    1 |          16384 |     True | 14.735 s | 0.1394 s | 0.1304 s | 14.770 s |  2.64 |    0.43 |  98000.0000 | 33000.0000 |  1000.0000 |    596 MB |
+|    CsvReader_ReadRowsBufferedAsync |                    1 |          16384 |     True | 11.684 s | 0.2307 s | 0.3080 s | 11.744 s |  2.09 |    0.45 |  97000.0000 | 33000.0000 |  1000.0000 |    593 MB |
+|            CsvReader_PipeRowsAsync |                    1 |          16384 |     True | 11.480 s | 0.3340 s | 0.9849 s | 11.788 s |  1.95 |    0.45 | 136000.0000 | 68000.0000 | 18000.0000 |    647 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                **32768** |           **8192** |    **False** |  **4.289 s** | **0.2845 s** | **0.8390 s** |  **4.195 s** |  **1.00** |    **0.00** | **286000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                32768 |           8192 |    False |  5.070 s | 0.2742 s | 0.8042 s |  4.973 s |  1.22 |    0.29 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                32768 |           8192 |    False |  7.539 s | 0.4475 s | 1.3195 s |  7.575 s |  1.83 |    0.50 |  97000.0000 | 33000.0000 |  1000.0000 |    592 MB |
+|    CsvReader_ReadRowsBufferedAsync |                32768 |           8192 |    False | 10.419 s | 0.3703 s | 1.0918 s | 10.550 s |  2.52 |    0.54 |  96000.0000 | 32000.0000 |          - |    590 MB |
+|            CsvReader_PipeRowsAsync |                32768 |           8192 |    False |  8.824 s | 0.4072 s | 1.2005 s |  8.856 s |  2.12 |    0.45 | 120000.0000 | 60000.0000 | 19000.0000 |    642 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                **32768** |           **8192** |     **True** |  **4.847 s** | **0.3853 s** | **1.1361 s** |  **4.559 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                32768 |           8192 |     True |  5.735 s | 0.3654 s | 1.0775 s |  5.736 s |  1.26 |    0.38 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                32768 |           8192 |     True |  9.536 s | 0.3960 s | 1.1676 s |  9.598 s |  2.07 |    0.53 |  97000.0000 | 33000.0000 |  1000.0000 |    592 MB |
+|    CsvReader_ReadRowsBufferedAsync |                32768 |           8192 |     True | 10.036 s | 0.4343 s | 1.2806 s | 10.179 s |  2.18 |    0.54 |  97000.0000 | 34000.0000 |  1000.0000 |    590 MB |
+|            CsvReader_PipeRowsAsync |                32768 |           8192 |     True |  9.096 s | 0.6506 s | 1.9183 s |  9.388 s |  2.00 |    0.68 | 122000.0000 | 61000.0000 | 20000.0000 |    640 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                **32768** |          **16384** |    **False** |  **3.142 s** | **0.0921 s** | **0.2627 s** |  **2.973 s** |  **1.00** |    **0.00** | **286000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                32768 |          16384 |    False |  3.746 s | 0.2012 s | 0.5837 s |  3.497 s |  1.20 |    0.19 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                32768 |          16384 |    False |  5.936 s | 0.5021 s | 1.4645 s |  5.395 s |  1.89 |    0.49 |  97000.0000 | 33000.0000 |  1000.0000 |    592 MB |
+|    CsvReader_ReadRowsBufferedAsync |                32768 |          16384 |    False |  9.809 s | 0.7927 s | 2.3373 s | 10.825 s |  3.10 |    0.79 |  97000.0000 | 33000.0000 |  1000.0000 |    590 MB |
+|            CsvReader_PipeRowsAsync |                32768 |          16384 |    False | 10.623 s | 0.2123 s | 0.3177 s | 10.733 s |  3.43 |    0.26 | 125000.0000 | 62000.0000 | 18000.0000 |    643 MB |
+|                                    |                      |                |          |          |          |          |          |       |         |             |            |            |           |
+|       **CsvReader_GetAllRowsFromFile** |                **32768** |          **16384** |     **True** |  **3.429 s** | **0.1530 s** | **0.4462 s** |  **3.225 s** |  **1.00** |    **0.00** | **287000.0000** |          **-** |          **-** |    **574 MB** |
+| CsvMemoryReader_GetAllRowsFromFile |                32768 |          16384 |     True |  3.983 s | 0.2089 s | 0.6062 s |  3.754 s |  1.18 |    0.24 | 252000.0000 |          - |          - |    505 MB |
+|  CsvReader_GetAllRowsFromFileAsync |                32768 |          16384 |     True |  9.226 s | 0.6405 s | 1.8886 s |  9.579 s |  2.74 |    0.68 |  97000.0000 | 33000.0000 |  1000.0000 |    592 MB |
+|    CsvReader_ReadRowsBufferedAsync |                32768 |          16384 |     True |  5.223 s | 0.1219 s | 0.3479 s |  5.045 s |  1.55 |    0.21 |  97000.0000 | 34000.0000 |  1000.0000 |    590 MB |
+|            CsvReader_PipeRowsAsync |                32768 |          16384 |     True |  4.119 s | 0.0152 s | 0.0134 s |  4.115 s |  1.28 |    0.12 | 118000.0000 | 59000.0000 | 20000.0000 |    640 MB |
