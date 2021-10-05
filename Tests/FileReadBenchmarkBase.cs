@@ -16,10 +16,10 @@ public abstract class FileReadBenchmarkBase
 			Share = FileShare.Read,
 		});
 
-	[Params(1, 32768)]
-	public int FileStreamBufferSize { get; set; } = 1;
+	[Params(1, 8192, 32768)]
+	public int FileStreamBufferSize { get; set; } = 8192;
 
-	[Params(8192, 16384)]
+	[Params(4092, 16384, 65536)]
 	public int ByteBufferSize { get; set; } = 16384;
 
 	[Params(true, false)]
