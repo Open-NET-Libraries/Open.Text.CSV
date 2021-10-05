@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 
 namespace Open.Text.CSV.Test;
 
-[MemoryDiagnoser]
+//[MemoryDiagnoser]
 public class PipelineBenchmarks : FileStreamReadBenchmark
 {
 	[Benchmark]

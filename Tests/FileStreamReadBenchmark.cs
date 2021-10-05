@@ -27,7 +27,7 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 		return count;
 	}
 
-	[Benchmark]
+	//[Benchmark]
 	public async Task<int> FileStream_ReadAsync()
 	{
 		var count = 0;
