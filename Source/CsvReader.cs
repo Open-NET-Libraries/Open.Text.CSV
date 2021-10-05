@@ -222,20 +222,21 @@ public class CsvReader<TRow> : IDisposable
 		var reader = rowBuffer.Reader;
 
 	loop:
-		while (reader.TryRead(out var row))
-			yield return row;
-
-		if (cancellationToken.IsCancellationRequested)
-			yield break;
 
 		try
 		{
-			if (reader.WaitToReadAsync(cancellationToken).AsTask().Result)
-				goto loop;
+			if (!reader.WaitToReadAsync(cancellationToken).AsTask().Result)
+				yield break;
 		}
 		catch (OperationCanceledException)
 		{
 		}
+
+		while (reader.TryRead(out var row))
+			yield return row;
+
+		if (!cancellationToken.IsCancellationRequested)
+			goto loop;
 	}
 
 	public ChannelReader<TRow> ReadRowsToChannel(
@@ -272,20 +273,23 @@ public class CsvReader<TRow> : IDisposable
 		var reader = rowBuffer.Reader;
 
 	loop:
-		while (reader.TryRead(out var row))
-			yield return row;
-
-		if (cancellationToken.IsCancellationRequested)
-			yield break;
 
 		try
 		{
-			if (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-				goto loop;
+			if (!await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+				yield break;
 		}
 		catch (OperationCanceledException)
 		{
+			yield break;
 		}
+
+		while (reader.TryRead(out var row))
+			yield return row;
+
+		if (!cancellationToken.IsCancellationRequested)
+			goto loop;
+
 	}
 #endif
 
