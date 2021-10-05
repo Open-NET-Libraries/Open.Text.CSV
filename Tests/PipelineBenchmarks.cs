@@ -11,8 +11,9 @@ public class PipelineBenchmarks : FileStreamReadBenchmark
 	public async Task<long> PipeReader_EnumerateAsync()
 	{
 		long count = 0;
-		await foreach(var sequence in PipeReader
-			.Create(Stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
+		using var stream = GetStream();
+		await foreach (var sequence in PipeReader
+			.Create(stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
 			.EnumerateAsync())
 		{
 			foreach (var mem in sequence)

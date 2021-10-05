@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Open.Text.CSV.Test;
 
@@ -27,55 +25,6 @@ public abstract class FileReadBenchmarkBase
 	[Params(true, false)]
 	public bool UseAsync { get; set; } = false;
 
-	FileStream GetStream() => GetStream(FileStreamBufferSize, UseAsync);
-
-	protected FileStream Stream { get; private set; }
-	protected byte[] ByteBuffer { get; private set; }
-
-	protected Memory<byte> ByteBufferMemory { get; private set; }
-
-	[IterationSetup]
-	public virtual void Setup()
-	{
-		Stream = GetStream();
-		ByteBuffer = new byte[ByteBufferSize]; // Get the exact size for the benchmark.
-		ByteBufferMemory = new Memory<byte>(ByteBuffer);
-	}
-
-	[IterationCleanup]
-	public virtual void Cleanup()
-	{
-		Stream.Dispose();
-		Stream = null;
-		ByteBuffer = null;
-		ByteBufferMemory = Memory<byte>.Empty;
-	}
-
-	protected void Run(Action test)
-	{
-		Setup();
-		test();
-		Cleanup();
-	}
-
-	protected T Run<T>(Func<T> test)
-	{
-		Setup(); 
-		try
-		{
-			return test();
-		}
-		finally
-		{
-			Cleanup();
-		}
-	}
-
-	protected async Task RunAsync(Func<Task> test)
-	{
-		Setup();
-		await test();
-		Cleanup();
-	}
+	protected FileStream GetStream() => GetStream(FileStreamBufferSize, UseAsync);
 
 }

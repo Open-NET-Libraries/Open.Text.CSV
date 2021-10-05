@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System;
 using System.IO;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
@@ -6,14 +7,18 @@ using Xunit;
 
 namespace Open.Text.CSV.Test;
 
-public class TextReaderBenchmarks : TextReaderBenchmarkBase
+public class TextReaderBenchmarks : FileReadBenchmarkBase
 {
 	[Benchmark]
 	public int StreamReader_Read()
 	{
 		var count = 0;
 		int next;
-		while ((next = Reader.Read(CharBuffer)) is not 0)
+		var buffer = new char[ByteBufferSize];
+		var span = buffer.AsSpan();
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		while ((next = reader.Read(span)) is not 0)
 			count += next;
 		return count;
 	}
@@ -23,7 +28,11 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 	{
 		var count = 0;
 		int next;
-		while ((next = await Reader.ReadAsync(CharBuffer).ConfigureAwait(false)) is not 0)
+		var buffer = new char[ByteBufferSize];
+		var mem = buffer.AsMemory();
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+ 		while ((next = await reader.ReadAsync(mem).ConfigureAwait(false)) is not 0)
 			count += next;
 		return count;
 	}
@@ -32,8 +41,9 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 	public async Task<long> PipeReader_EnumerateAsync()
 	{
 		long count = 0;
+		using var stream = GetStream();
 		await foreach (var buffer in PipeReader
-			.Create(Stream)
+			.Create(stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
 			.EnumerateAsync()
 			.DecodeAsync())
 		{
@@ -43,38 +53,46 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 		return count;
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public int StreamReader_ReadLine()
 	{
 		var count = 0;
-		while (Reader.ReadLine() is not null)
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		while (reader.ReadLine() is not null)
 			count++;
 		return count;
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<int> StreamReader_ReadLineAsync()
 	{
 		var count = 0;
-		while (await Reader.ReadLineAsync().ConfigureAwait(false) is not null)
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		while (await reader.ReadLineAsync().ConfigureAwait(false) is not null)
 			count++;
 		return count;
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<int> StreamReader_SingleBufferReadAsync()
 	{
 		var count = 0;
-		await foreach (var buffer in Reader.SingleBufferReadAsync(FileStreamBufferSize))
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		await foreach (var buffer in reader.SingleBufferReadAsync(ByteBufferSize))
 			count += buffer.Length;
 		return count;
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<int> StreamReader_DualBufferReadAsync()
 	{
 		var count = 0;
-		await foreach (var buffer in Reader.DualBufferReadAsync(FileStreamBufferSize))
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		await foreach (var buffer in reader.DualBufferReadAsync(ByteBufferSize))
 			count += buffer.Length;
 		return count;
 	}
@@ -83,7 +101,9 @@ public class TextReaderBenchmarks : TextReaderBenchmarkBase
 	public async Task<int> StreamReader_PreemptiveReadLineAsync()
 	{
 		var count = 0;
-		await foreach (var buffer in Reader.PreemptiveReadLineAsync())
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		await foreach (var buffer in reader.PreemptiveReadLineAsync())
 			count++;
 		return count;
 	}
@@ -95,10 +115,10 @@ public class FileReadMethodTests : TextReaderBenchmarks
 
 	static int GetExpectedCharacterCount()
 	{
-		var buffer = new char[4096];
-		using var sr = new StreamReader(TEST_FILE);
 		var count = 0;
 		int next;
+		var buffer = new char[4096];
+		using var sr = new StreamReader(TEST_FILE);
 		while ((next = sr.Read(buffer)) is not 0)
 		{
 			count += next;
@@ -108,20 +128,20 @@ public class FileReadMethodTests : TextReaderBenchmarks
 	}
 
 	[Fact]
-	public Task StreamReader_SingleBufferReadAsyncTest() => RunAsync(
-		async () => Assert.Equal(
+	public async Task StreamReader_SingleBufferReadAsyncTest()
+		=> Assert.Equal(
 			ExpectedCharacterCount,
-			await StreamReader_SingleBufferReadAsync()));
+			await StreamReader_SingleBufferReadAsync());
 
 	[Fact]
-	public Task StreamReader_DualBufferReadAsyncTest() => RunAsync(
-		async () => Assert.Equal(
+	public async Task StreamReader_DualBufferReadAsyncTest()
+		=> Assert.Equal(
 			ExpectedCharacterCount,
-			await StreamReader_DualBufferReadAsync()));
+			await StreamReader_DualBufferReadAsync());
 
 	[Fact]
-	public Task StreamReader_PreemptiveReadLineAsyncTest() => RunAsync(
-		async () => Assert.Equal(
+	public async Task StreamReader_PreemptiveReadLineAsyncTest()
+		 => Assert.Equal(
 			CsvFileReadTests.ExpectedLineCount,
-			await StreamReader_PreemptiveReadLineAsync()));
+			await StreamReader_PreemptiveReadLineAsync());
 }
