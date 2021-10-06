@@ -8,15 +8,12 @@ using Xunit;
 namespace Open.Text.CSV.Test;
 
 [MemoryDiagnoser]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Some benchmarks are disabled (commented out).")]
 
-public class CsvFileReadTests : FileReadBenchmarkBase
+public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 {
-	public static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
+	public CsvFileReadBenchmarks(string testFile = null) : base(testFile) { }
 
 	const int ROW_BUFFER = 100;
-
-	static readonly IList<IList<string>> Data = CsvReader.GetAllRowsFromFile(TEST_FILE);
 
 	[Benchmark(Baseline = true)]
 	public int CsvReader_GetAllRowsFromFile()
@@ -45,70 +42,14 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		return count;
 	}
 
-	[Fact]
 
-	public void CsvReader_GetAllRowsFromFileTest()
-		=> Assert.Equal(ExpectedLineCount, CsvReader_GetAllRowsFromFile());
-
-	[Fact]
-
-	public void CsvMemoryReader_GetAllRowsFromFileTest()
-	{
-		var rows = new List<List<string>>();
-		using var stream = GetStream();
-		using var reader = new StreamReader(stream);
-		using var csv = new CsvMemoryReader(reader);
-		foreach (var row in csv.ReadRows())
-		{
-			var list = new List<string>(csv.MaxFields);
-			foreach (var e in row.Memory.Span)
-				list.Add(e);
-			row.Dispose();
-			rows.Add(list);
-		}
-
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
-
-	public List<List<string>> Sylvan_GetAllRowsFromFile()
-	{
-		var count = 0;
-		var rows = new List<List<string>>();
-		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(
-			TEST_FILE,
-			new Sylvan.Data.Csv.CsvDataReaderOptions
-			{
-				HasHeaders = false
-			});
-
-		var fields = reader.FieldCount;
-		while (reader.Read())
-		{
-			var row = new List<string>(fields);
-			for (var i = 0; i < fields; i++)
-				row.Add(reader.GetString(i));
-			rows.Add(row);
-			count++;
-		}
-
-		return rows;
-	}
-
-	[Fact]
-	public void Sylvan_GetAllRowsFromFileTest()
-	{
-		var rows = Sylvan_GetAllRowsFromFile();
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
 
 	//[Benchmark]
 	public List<Record> Sylvan_GetAllRowsFromFile_StrongType()
 	{
 		var count = 0;
 		var rows = new List<Record>();
-		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TEST_FILE);
+		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(TestFile);
 		var fields = reader.FieldCount;
 		while (reader.Read())
 		{
@@ -133,9 +74,6 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		return rows;
 	}
 
-	[Fact]
-	public void Sylvan_GetAllRowsFromFileTest_StrongType()
-	   => Assert.Equal(ExpectedLineCount - 1, Sylvan_GetAllRowsFromFile_StrongType().Count);
 
 	public class Record
 	{
@@ -166,31 +104,17 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		return list;
 	}
 
-	[Fact]
-	public async Task CsvReader_GetAllRowsFromFileAsyncTest()
-	{
-		var rows = await CsvReader_GetAllRowsFromFileAsync();
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
 
 
 	//[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsToChannel()
 	{
 		var rows = new List<IList<string>>();
-		_ = await CsvReader.ReadRowsToChannel(TEST_FILE, ROW_BUFFER)
+		_ = await CsvReader.ReadRowsToChannel(TestFile, ROW_BUFFER)
 			.ReadAll(rows.Add);
 		return rows;
 	}
 
-	[Fact]
-	public async Task CsvReader_ReadRowsToChannelTest()
-	{
-		var rows = await CsvReader_ReadRowsToChannel();
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
 
 	//[Benchmark]
 	public IList<IList<string>> CsvReader_ReadRowsBuffered()
@@ -203,13 +127,7 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		return rows;
 	}
 
-	[Fact]
-	public void CsvReader_ReadRowsBufferedTest()
-	{
-		var rows = CsvReader_ReadRowsBuffered();
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
+
 
 	[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsBufferedAsync()
@@ -222,13 +140,7 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		return rows;
 	}
 
-	[Fact]
-	public async Task CsvReader_ReadRowsBufferedAsyncTest()
-	{
-		var rows = await CsvReader_ReadRowsBufferedAsync();
-		Assert.Equal(ExpectedLineCount, rows.Count);
-		Assert.Equal(Data, rows);
-	}
+
 
 	[Benchmark]
 	public async Task<int> CsvReader_PipeRowsAsync()
@@ -239,6 +151,108 @@ public class CsvFileReadTests : FileReadBenchmarkBase
 		await foreach (var row in CsvReader.PipeRowsAsync(stream))
 			count++;
 		return count;
+	}
+
+}
+
+public class CsvFileReadTests : CsvFileReadBenchmarks
+{
+	public static readonly int ExpectedLineCount = 1000001;// FileReadMethodTests.FileRowCount();
+	static readonly IList<IList<string>> Data = CsvReader.GetAllRowsFromFile(TEST_FILE);
+
+	[Fact]
+
+	public void CsvReader_GetAllRowsFromFileTest()
+	=> Assert.Equal(ExpectedLineCount, CsvReader_GetAllRowsFromFile());
+
+	[Fact]
+
+	public void CsvMemoryReader_GetAllRowsFromFileTest()
+	{
+		var rows = new List<List<string>>();
+		using var stream = GetStream();
+		using var reader = new StreamReader(stream);
+		using var csv = new CsvMemoryReader(reader);
+		foreach (var row in csv.ReadRows())
+		{
+			var list = new List<string>(csv.MaxFields);
+			foreach (var e in row.Memory.Span)
+				list.Add(e);
+			row.Dispose();
+			rows.Add(list);
+		}
+
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
+	}
+
+	public List<List<string>> Sylvan_GetAllRowsFromFile()
+	{
+		var count = 0;
+		var rows = new List<List<string>>();
+		using var reader = Sylvan.Data.Csv.CsvDataReader.Create(
+			TestFile,
+			new Sylvan.Data.Csv.CsvDataReaderOptions
+			{
+				HasHeaders = false
+			});
+
+		var fields = reader.FieldCount;
+		while (reader.Read())
+		{
+			var row = new List<string>(fields);
+			for (var i = 0; i < fields; i++)
+				row.Add(reader.GetString(i));
+			rows.Add(row);
+			count++;
+		}
+
+		return rows;
+	}
+
+	[Fact]
+	public void Sylvan_GetAllRowsFromFileTest()
+	{
+		var rows = Sylvan_GetAllRowsFromFile();
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
+	}
+
+	[Fact]
+	public void Sylvan_GetAllRowsFromFileTest_StrongType()
+	   => Assert.Equal(ExpectedLineCount - 1, Sylvan_GetAllRowsFromFile_StrongType().Count);
+
+
+	[Fact]
+	public async Task CsvReader_GetAllRowsFromFileAsyncTest()
+	{
+		var rows = await CsvReader_GetAllRowsFromFileAsync();
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
+	}
+
+	[Fact]
+	public void CsvReader_ReadRowsBufferedTest()
+	{
+		var rows = CsvReader_ReadRowsBuffered();
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
+	}
+
+	[Fact]
+	public async Task CsvReader_ReadRowsBufferedAsyncTest()
+	{
+		var rows = await CsvReader_ReadRowsBufferedAsync();
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
+	}
+
+	[Fact]
+	public async Task CsvReader_ReadRowsToChannelTest()
+	{
+		var rows = await CsvReader_ReadRowsToChannel();
+		Assert.Equal(ExpectedLineCount, rows.Count);
+		Assert.Equal(Data, rows);
 	}
 
 	[Fact]

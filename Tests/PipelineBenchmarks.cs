@@ -7,6 +7,9 @@ namespace Open.Text.CSV.Test;
 //[MemoryDiagnoser]
 public class PipelineBenchmarks : FileStreamReadBenchmark
 {
+	public PipelineBenchmarks(string testFile = null) : base(testFile) { }
+
+
 	[Benchmark]
 	public async Task<long> PipeReader_EnumerateAsync()
 	{

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Open.Diagnostics" Version="1.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tests\Open.Text.CSV.Test.csproj" />
   </ItemGroup>
 

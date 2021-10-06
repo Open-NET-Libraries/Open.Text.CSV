@@ -35,10 +35,7 @@ public class ExpandableMemory<T> : IDisposable
 		Length++;
 	}
 
-	public void Clear()
-	{
-		Length = 0;
-	}
+	public void Clear() => Length = 0;
 
 	public MemoryOwner<T> ExtractOwner()
 	{

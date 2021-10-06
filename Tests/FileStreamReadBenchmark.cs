@@ -6,6 +6,9 @@ namespace Open.Text.CSV.Test;
 
 public class FileStreamReadBenchmark : FileReadBenchmarkBase
 {
+	public FileStreamReadBenchmark(string testFile = null) : base(testFile) { }
+
+
 	/*
 	 * NOTES:
 	 * 

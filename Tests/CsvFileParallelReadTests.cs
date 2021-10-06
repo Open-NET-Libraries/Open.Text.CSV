@@ -5,27 +5,20 @@ namespace Open.Text.CSV.Test;
 
 public class CsvFileParallelReadTests
 {
-	readonly CsvFileReadTests _root = new();
+	readonly CsvFileReadBenchmarks _root = new();
 
 	[Benchmark]
 	public void CsvReader_GetAllRowsFromFileInParallel()
 	{
-		Parallel.Invoke(
-			_root.CsvReader_GetAllRowsFromFileTest,
-			_root.CsvReader_GetAllRowsFromFileTest,
-			_root.CsvReader_GetAllRowsFromFileTest,
-			_root.CsvReader_GetAllRowsFromFileTest
-		);
+		void action() => _root.CsvReader_GetAllRowsFromFile();
+		Parallel.Invoke(action, action, action, action);
 	}
 
 	[Benchmark]
 	public Task CsvReader_GetAllRowsFromFileAsyncParallel()
-	{
-		return Task.WhenAll(
+		=> Task.WhenAll(
 			_root.CsvReader_GetAllRowsFromFileAsync(),
 			_root.CsvReader_GetAllRowsFromFileAsync(),
 			_root.CsvReader_GetAllRowsFromFileAsync(),
-			_root.CsvReader_GetAllRowsFromFileAsync()
-		);
-	}
+			_root.CsvReader_GetAllRowsFromFileAsync());
 }

@@ -14,6 +14,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="Open.ChannelExtensions" Version="5.0.0" />
+    <PackageReference Include="Open.Diagnostics" Version="1.4.1" />
     <PackageReference Include="Sylvan.Data.Csv" Version="1.1.8" />
     <PackageReference Include="System.IO.Pipelines" Version="5.0.1" />
     <PackageReference Include="xunit" Version="2.4.1" />

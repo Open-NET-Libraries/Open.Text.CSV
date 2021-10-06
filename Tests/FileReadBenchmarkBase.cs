@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System;
 using System.IO;
 
 namespace Open.Text.CSV.Test;
@@ -6,8 +7,12 @@ namespace Open.Text.CSV.Test;
 public abstract class FileReadBenchmarkBase
 {
 	protected const string TEST_FILE = "TestData.csv";
-	protected static FileStream GetStream(int bufferSize, bool useAsync = false)
-		=> new(TEST_FILE, new FileStreamOptions
+	protected FileReadBenchmarkBase(string testFile = null) => TestFile = testFile ?? TEST_FILE;
+
+	protected readonly string TestFile;
+
+	protected FileStream GetStream(int bufferSize, bool useAsync = false)
+		=> new(TestFile, new FileStreamOptions
 		{
 			Access = FileAccess.Read,
 			BufferSize = bufferSize,
