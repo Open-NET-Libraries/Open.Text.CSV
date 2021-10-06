@@ -1,7 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Open.ChannelExtensions;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,7 +17,7 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 
 	const int ROW_BUFFER = 100;
 
-	[Benchmark(Baseline = true)]
+	//[Benchmark(Baseline = true)]
 	public int CsvReader_GetAllRowsFromFile()
 	{
 		int count = 0;
@@ -26,7 +28,7 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 		return count;
 	}
 
-	[Benchmark]
+	//[Benchmark]
 	public int CsvMemoryReader_GetAllRowsFromFile()
 	{
 		int count = 0;
@@ -141,16 +143,15 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 	}
 
 
-
 	[Benchmark]
-	public async Task<int> CsvReader_PipeRowsAsync()
+	public async Task<List<IMemoryOwner<string>>> CsvReader_PipeRowsAsync()
 	{
-		int count = 0;
+		var rows = new List<IMemoryOwner<string>>();
 		using var stream = GetStream();
 		using var reader = new StreamReader(stream);
 		await foreach (var row in CsvReader.PipeRowsAsync(stream))
-			count++;
-		return count;
+			rows.Add(row);
+		return rows;
 	}
 
 }
@@ -258,7 +259,13 @@ public class CsvFileReadTests : CsvFileReadBenchmarks
 	[Fact]
 	public async Task CsvReader_PipeRowsAsyncTest()
 	{
-		var count = await CsvReader_PipeRowsAsync();
-		Assert.Equal(ExpectedLineCount, count);
+		var results = await CsvReader_PipeRowsAsync();
+		Assert.Equal(ExpectedLineCount, results.Count);
+		Assert.Equal(Data, results.Select(row =>
+		{
+			var r = row.Memory.ToArray();
+			row.Dispose();
+			return r;
+		}));
 	}
 }
