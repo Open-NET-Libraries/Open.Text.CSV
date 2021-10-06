@@ -142,7 +142,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 		return rows;
 	}
 
-
 	[Benchmark]
 	public async Task<List<IMemoryOwner<string>>> CsvReader_PipeRowsAsync()
 	{

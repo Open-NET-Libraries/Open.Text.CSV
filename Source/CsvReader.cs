@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.IO.Pipelines;
@@ -76,7 +77,11 @@ public class CsvReader<TRow> : IDisposable
 
 	}
 
-	public bool TryReadNextRow(out TRow? row)
+	public bool TryReadNextRow(
+#if NULL_ANALYSIS
+	[NotNullWhen(true)]
+#endif
+		out TRow? row)
 	{
 		row = ReadNextRow();
 		return row is not null;
@@ -387,7 +392,7 @@ public sealed class CsvReader : CsvReader<IList<string>>
 			yield return row;
 	}
 
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2016:Forward the 'CancellationToken' parameter to methods", Justification = "Is handled internally.")]
+	[SuppressMessage("Reliability", "CA2016:Forward the 'CancellationToken' parameter to methods", Justification = "Is handled internally.")]
 	public static ChannelReader<IList<string>> ReadRowsToChannel(
 		string filepath,
 		int rowBufferCount = -1,
@@ -505,7 +510,7 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 			yield return row;
 	}
 
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2016:Forward the 'CancellationToken' parameter to methods", Justification = "Is handled internally.")]
+	[SuppressMessage("Reliability", "CA2016:Forward the 'CancellationToken' parameter to methods", Justification = "Is handled internally.")]
 	public static ChannelReader<IMemoryOwner<string>> ReadRowsToChannel(
 		string filepath,
 		int rowBufferCount = -1,

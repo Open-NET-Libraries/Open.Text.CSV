@@ -9,6 +9,9 @@ namespace Open.Text.CSV.Test;
 
 public class TextReaderBenchmarks : FileReadBenchmarkBase
 {
+	public TextReaderBenchmarks(string testFile = null) : base(testFile) { }
+
+
 	[Benchmark]
 	public int StreamReader_Read()
 	{
@@ -97,7 +100,7 @@ public class TextReaderBenchmarks : FileReadBenchmarkBase
 		return count;
 	}
 
-	//[Benchmark]
+	[Benchmark]
 	public async Task<int> StreamReader_PreemptiveReadLineAsync()
 	{
 		var count = 0;
