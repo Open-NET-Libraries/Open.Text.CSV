@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Open.IO.Extensions;
 using System;
 using System.IO;
 using System.IO.Pipelines;
@@ -37,22 +38,6 @@ public class TextReaderBenchmarks : FileReadBenchmarkBase
 		using var reader = new StreamReader(stream);
  		while ((next = await reader.ReadAsync(mem).ConfigureAwait(false)) is not 0)
 			count += next;
-		return count;
-	}
-
-	[Benchmark]
-	public async Task<long> PipeReader_EnumerateAsync()
-	{
-		long count = 0;
-		using var stream = GetStream();
-		await foreach (var buffer in PipeReader
-			.Create(stream, new StreamPipeReaderOptions(bufferSize: ByteBufferSize))
-			.EnumerateAsync()
-			.DecodeAsync())
-		{
-			count += buffer.WrittenMemory.Length;
-		}
-
 		return count;
 	}
 

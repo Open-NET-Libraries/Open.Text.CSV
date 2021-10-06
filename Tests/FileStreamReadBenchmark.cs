@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Open.IO.Extensions;
 using System;
 using System.Threading.Tasks;
 
@@ -54,41 +55,6 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 			.SingleBufferReadAsync(ByteBufferSize)
 			.ConfigureAwait(false))
 			count += buffer.Length;
-		return count;
-	}
-
-	[Benchmark]
-	public async Task<long> FileStream_EnumerateAsync()
-	{
-		long count = 0;
-		using var stream = GetStream();
-		await foreach (var sequence in stream
-			.EnumerateAsync(ByteBufferSize)
-			.ConfigureAwait(false))
-		{
-			foreach(var mem in sequence)
-				count += mem.Length;
-		}
-
-		return count;
-	}
-
-	[Benchmark]
-	public async Task<long> FileStream_EnumerateAsync_Yielded()
-	{
-		long count = 0;
-		using var stream = GetStream();
-		await foreach (var sequence in stream
-			.EnumerateAsync(ByteBufferSize)
-			.ConfigureAwait(false))
-		{
-			foreach (var mem in sequence)
-			{
-				count += mem.Length;
-				await Task.Yield();
-			}
-		}
-
 		return count;
 	}
 

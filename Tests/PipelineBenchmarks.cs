@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Threading.Tasks;
 using System.IO.Pipelines;
+using Open.IO.Extensions;
 
 namespace Open.Text.CSV.Test;
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -17,7 +17,7 @@
 		<RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-		<Version>3.1.1</Version>
+		<Version>3.2.0</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -25,19 +25,17 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageIcon>logo.png</PackageIcon>
 		<DefineConstants Condition="$(TargetFramework) == 'netstandard2.1'">NULL_ANALYSIS;BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;$(DefineConstants)</DefineConstants>
-		<DefineConstants Condition="$(TargetFramework) == 'net6.0'">NULL_ANALYSIS;BUFFERS;ASYNC_DISPOSE;ASYNC_ENUMERABLE;BUFFERWRITER_DECODE;$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Archive\**" />
-	  <EmbeddedResource Remove="Archive\**" />
-	  <None Remove="Archive\**" />
+		<Compile Remove="Archive\**" />
+		<EmbeddedResource Remove="Archive\**" />
+		<None Remove="Archive\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.0" />
-		<PackageReference Include="System.IO.Pipelines" Version="5.0.1" />
 		<PackageReference Include="System.Threading.Channels" Version="5.0.0" />
 	</ItemGroup>
 
@@ -56,4 +54,7 @@
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+		<PackageReference Include="Open.IO.Extensions" Version="1.0.0" />
+	</ItemGroup>
 </Project>

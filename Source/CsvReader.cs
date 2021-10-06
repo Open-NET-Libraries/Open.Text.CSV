@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
@@ -431,24 +430,6 @@ public sealed class CsvReader : CsvReader<IList<string>>
 			yield return row;
 	}
 #endif
-
-#if BUFFERWRITER_DECODE
-	public static async IAsyncEnumerable<IMemoryOwner<string>> PipeRowsAsync(
-		Stream source,
-		[EnumeratorCancellation] CancellationToken cancellationToken = default)
-	{
-		var rowBuilder = new MemoryCsvRowBuilder();
-		await foreach(var bufferWriter in PipeReader.Create(source)
-			.EnumerateAsync(cancellationToken)
-			.DecodeAsync(cancellationToken: cancellationToken))
-		{
-			var chunk = bufferWriter.WrittenMemory;
-			while(rowBuilder.Add(chunk, out chunk, out var row))
-				yield return row;
-		}
-	}
-#endif
-
 }
 
 public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>

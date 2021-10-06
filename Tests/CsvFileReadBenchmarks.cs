@@ -141,18 +141,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 			rows.Add(row);
 		return rows;
 	}
-
-	[Benchmark]
-	public async Task<List<IMemoryOwner<string>>> CsvReader_PipeRowsAsync()
-	{
-		var rows = new List<IMemoryOwner<string>>();
-		using var stream = GetStream();
-		using var reader = new StreamReader(stream);
-		await foreach (var row in CsvReader.PipeRowsAsync(stream))
-			rows.Add(row);
-		return rows;
-	}
-
 }
 
 public class CsvFileReadTests : CsvFileReadBenchmarks
@@ -253,18 +241,5 @@ public class CsvFileReadTests : CsvFileReadBenchmarks
 		var rows = await CsvReader_ReadRowsToChannel();
 		Assert.Equal(ExpectedLineCount, rows.Count);
 		Assert.Equal(Data, rows);
-	}
-
-	[Fact]
-	public async Task CsvReader_PipeRowsAsyncTest()
-	{
-		var results = await CsvReader_PipeRowsAsync();
-		Assert.Equal(ExpectedLineCount, results.Count);
-		Assert.Equal(Data, results.Select(row =>
-		{
-			var r = row.Memory.ToArray();
-			row.Dispose();
-			return r;
-		}));
 	}
 }
