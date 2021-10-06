@@ -2,43 +2,42 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Open.Text.CSV
+namespace Open.Text.CSV;
+
+public static class CsvUtility
 {
-	public static class CsvUtility
+	public const string NEWLINE = "\r\n";
+	public static readonly Regex QUOTESNEEDED = new("^\\s+|[,\r\n]|\\s+$");
+
+	public static string WrapQuotes(string value)
 	{
-		public const string NEWLINE = "\r\n";
-		public static readonly Regex QUOTESNEEDED = new("^\\s+|[,\r\n]|\\s+$");
-
-		public static string WrapQuotes(string value)
-		{
-			if (value is null)
-				return string.Empty;
-#if NETSTANDARD2_1_OR_GREATER
-			return '"' + value.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
+		if (value is null)
+			return string.Empty;
+#if NETSTANDARD2_0
+		return '"' + value.Replace("\"", "\"\"") + '"';
 #else
-			return '"' + value.Replace("\"", "\"\"") + '"';
+		return '"' + value.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
 #endif
-		}
+	}
 
-		public static string FormatValue(string value, bool forceQuotes = false)
+	public static string FormatValue(string value, bool forceQuotes = false)
+		=> value is null || value.Length == 0
+		? string.Empty
+		: forceQuotes || QUOTESNEEDED.IsMatch(value)
+		? WrapQuotes(value)
+		: value;
+
+	public static string ExportValue(object? value, bool forceQuotes = false)
+	{
+		if (value is null) return ",";
+		var v = value switch
 		{
-			if (value is null)
-				return string.Empty;
+			DateTime datetime => datetime.TimeOfDay == TimeSpan.Zero ?
+				datetime.ToString("d", CultureInfo.InvariantCulture) : // Use short date.
+				datetime.ToString(CultureInfo.InvariantCulture),
+			_ => value.ToString(),
+		};
 
-			if (!string.IsNullOrEmpty(value) && forceQuotes || QUOTESNEEDED.IsMatch(value))
-				return WrapQuotes(value);
-
-			return value;
-		}
-
-		public static string ExportValue(object? value, bool forceQuotes = false)
-			=> FormatValue(value switch
-			{
-				DateTime datetime => datetime.TimeOfDay == TimeSpan.Zero ?
-					datetime.ToString("d", CultureInfo.InvariantCulture) : // Use short date.
-					datetime.ToString(CultureInfo.InvariantCulture),
-				_ => value is null ? string.Empty : value.ToString(),
-			}, forceQuotes) + ",";
-
+		return $"{FormatValue(v!, forceQuotes)},";
 	}
 }

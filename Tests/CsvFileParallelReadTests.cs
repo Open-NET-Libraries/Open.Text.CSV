@@ -1,36 +1,24 @@
 ﻿using BenchmarkDotNet.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Open.Text.CSV.Test
+namespace Open.Text.CSV.Test;
+
+public class CsvFileParallelReadTests
 {
-	public class CsvFileParallelReadTests
+	readonly CsvFileReadBenchmarks _root = new();
+
+	[Benchmark]
+	public void CsvReader_GetAllRowsFromFileInParallel()
 	{
-		readonly CsvFileReadTests _root = new();
-
-		[Benchmark]
-		public void GetAllRowsFromFileInParallel()
-		{
-			Parallel.Invoke(
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile,
-				_root.GetAllRowsFromFile
-			);
-		}
-
-		[Benchmark]
-		public Task GetAllRowsFromFileAsyncParallel()
-		{
-			return Task.WhenAll(
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync(),
-				_root.GetAllRowsFromFileAsync()
-			);
-		}
+		void action() => _root.CsvReader_GetAllRowsFromFile();
+		Parallel.Invoke(action, action, action, action);
 	}
+
+	[Benchmark]
+	public Task CsvReader_GetAllRowsFromFileAsyncParallel()
+		=> Task.WhenAll(
+			_root.CsvReader_GetAllRowsFromFileAsync(),
+			_root.CsvReader_GetAllRowsFromFileAsync(),
+			_root.CsvReader_GetAllRowsFromFileAsync(),
+			_root.CsvReader_GetAllRowsFromFileAsync());
 }
