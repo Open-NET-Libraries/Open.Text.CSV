@@ -11,7 +11,7 @@ public static class CsvRowBuilderTests
 	{
 		var rb = new ListCsvRowBuilder();
 		rb.Add("\"A\", B, C,\r\n", out _, out IList<string> row);
-		Assert.Equal(3, row.Count);
+		Assert.Equal(4, row.Count);
 		Assert.Equal("C", row[2]);
 
 		rb.Add("D, \"E\", F\n", out _, out row);
@@ -29,7 +29,7 @@ public static class CsvRowBuilderTests
 		Assert.Equal("L\nX", row[2]);
 
 		rb.Add("L, M, N,\nO,P,Q", out var remaining, out row);
-		Assert.Equal(3, row.Count);
+		Assert.Equal(4, row.Count);
 		Assert.Equal("N", row[2]);
 		Assert.Equal(5, remaining.Length);
 	}
@@ -41,7 +41,7 @@ public static class CsvRowBuilderTests
 		var rb = new MemoryCsvRowBuilder();
 		rb.Add("\"A\", B, C,\r\n", out _, out IMemoryOwner<string> mem);
 		var row = mem.Memory.Span;
-		Assert.Equal(3, row.Length);
+		Assert.Equal(4, row.Length);
 		Assert.Equal("C", row[2]);
 
 		rb.Add("D, \"E\", F\n", out _, out mem);
@@ -63,7 +63,7 @@ public static class CsvRowBuilderTests
 
 		rb.Add("L, M, N,\nO,P,Q", out var remaining, out mem);
 		row = mem.Memory.Span;
-		Assert.Equal(3, row.Length);
+		Assert.Equal(4, row.Length);
 		Assert.Equal("N", row[2]);
 		Assert.Equal(5, remaining.Length);
 	}

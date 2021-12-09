@@ -17,7 +17,7 @@
 		<RepositoryUrl>https://github.com/Open-NET-Libraries/Open.Text.CSV/</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>csv, csharp, dotnetcore, textwriter, streamreader</PackageTags>
-		<Version>3.2.0</Version>
+		<Version>3.2.1</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>

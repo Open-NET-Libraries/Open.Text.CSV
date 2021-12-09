@@ -12,7 +12,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 {
 	const string CORRUPT_FIELD = "Corrupt field found. A double quote is not escaped or there is extra data after a quoted field.";
 
-	State _state = State.BeforeField;
+	State _state = State.RowStart;
 	protected int FieldLen = 0;
 	public int MaxFields { get; protected set; }
 
@@ -21,7 +21,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// </summary>
 	public virtual void Reset()
 	{
-		_state = State.BeforeField;
+		_state = State.RowStart;
 		ResetFieldBuffer();
 		FieldLen = 0;
 	}
@@ -41,6 +41,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	{
 		switch (_state)
 		{
+			case State.BeforeField:
 			case State.InField:
 			case State.Quote:
 				AddEntry();
@@ -63,6 +64,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 		row = default;
 		switch (_state)
 		{
+			case State.RowStart:
 			case State.BeforeField:
 				switch (c)
 				{
@@ -76,18 +78,22 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 
 					case ',':
 						AddEntry();
+						_state = State.BeforeField;
 						return false;
 
 					case '\r':
+						if(_state == State.BeforeField) AddEntry();
 						_state = State.EndOfRow;
 						return false;
 
 					case '\n':
+						if (_state == State.BeforeField) AddEntry();
+						_state = State.RowStart;
 						break;
 
 					default:
-						_state = State.InField;
 						AddNextChar(in c);
+						_state = State.InField;
 						return false;
 				}
 
@@ -114,6 +120,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 
 					case '\n':
 						AddEntry();
+						_state = State.RowStart;
 						break;
 
 					default:
@@ -124,6 +131,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 				break;
 
 			case State.InQuotedField:
+
 				if (c == '"') _state = State.Quote;
 				else AddNextChar(in c);
 				return false;
@@ -154,6 +162,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 
 					case '\n':
 						AddEntry();
+						_state = State.RowStart;
 						break;
 
 					default:
@@ -179,6 +188,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 						return false;
 
 					case '\n':
+						_state = State.RowStart;
 						break;
 
 					default:
@@ -312,6 +322,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 
 	enum State
 	{
+		RowStart,
 		BeforeField,
 		InField,
 		InQuotedField,

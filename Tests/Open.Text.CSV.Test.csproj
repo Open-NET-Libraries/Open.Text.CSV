@@ -33,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="PackageAssets.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestData.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
