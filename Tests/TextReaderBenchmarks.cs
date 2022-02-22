@@ -12,7 +12,6 @@ public class TextReaderBenchmarks : FileReadBenchmarkBase
 {
 	public TextReaderBenchmarks(string testFile = null) : base(testFile) { }
 
-
 	[Benchmark]
 	public int StreamReader_Read()
 	{

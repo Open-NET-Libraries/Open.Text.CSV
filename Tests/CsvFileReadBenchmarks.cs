@@ -44,8 +44,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 		return count;
 	}
 
-
-
 	//[Benchmark]
 	public List<Record> Sylvan_GetAllRowsFromFile_StrongType()
 	{
@@ -76,7 +74,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 		return rows;
 	}
 
-
 	public class Record
 	{
 		public int GlobalRank { get; set; }
@@ -106,8 +103,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 		return list;
 	}
 
-
-
 	//[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsToChannel()
 	{
@@ -116,7 +111,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 			.ReadAll(rows.Add);
 		return rows;
 	}
-
 
 	//[Benchmark]
 	public IList<IList<string>> CsvReader_ReadRowsBuffered()
@@ -128,8 +122,6 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 			rows.Add(row);
 		return rows;
 	}
-
-
 
 	[Benchmark]
 	public async Task<IList<IList<string>>> CsvReader_ReadRowsBufferedAsync()
@@ -209,7 +201,6 @@ public class CsvFileReadTests : CsvFileReadBenchmarks
 	[Fact]
 	public void Sylvan_GetAllRowsFromFileTest_StrongType()
 	   => Assert.Equal(ExpectedLineCount - 1, Sylvan_GetAllRowsFromFile_StrongType().Count);
-
 
 	[Fact]
 	public async Task CsvReader_GetAllRowsFromFileAsyncTest()

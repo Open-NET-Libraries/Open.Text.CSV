@@ -46,5 +46,4 @@ public class ExpandableMemory<T> : IDisposable
 	}
 
 	public void Dispose() => _owner.Dispose();
-
 }

@@ -16,12 +16,12 @@ var sb = new StringBuilder();
 
 var report = new Open.Diagnostics.BenchmarkConsoleReport<TextReaderBenchmarks>(10, sb, SimpleBenchmark<TextReaderBenchmarks>.Results);
 
-report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=false", count => new TextReaderBenchmarks(filePath)
+report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=false", _ => new TextReaderBenchmarks(filePath)
 {
 	UseAsync = false
 });
 
-report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=true", count => new TextReaderBenchmarks(filePath)
+report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=true", _ => new TextReaderBenchmarks(filePath)
 {
 	UseAsync = true
 });

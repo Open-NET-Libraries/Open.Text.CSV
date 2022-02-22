@@ -73,7 +73,6 @@ public class CsvReader<TRow> : IDisposable
 		}
 
 		goto loop;
-
 	}
 
 	public bool TryReadNextRow(
@@ -192,9 +191,7 @@ public class CsvReader<TRow> : IDisposable
 				while (_rowBuilder.Add(remaining, out remaining, out nextRow));
 			}
 
-			var swap = cNext;
-			cNext = cCurrent;
-			cCurrent = swap;
+			(cCurrent, cNext) = (cNext, cCurrent);
 			next = current;
 
 			goto loop;
@@ -255,7 +252,6 @@ public class CsvReader<TRow> : IDisposable
 		return rowBuffer.Reader;
 	}
 
-
 #if ASYNC_ENUMERABLE
 
 	public async IAsyncEnumerable<TRow> ReadRowsAsync()
@@ -293,12 +289,10 @@ public class CsvReader<TRow> : IDisposable
 
 		if (!cancellationToken.IsCancellationRequested)
 			goto loop;
-
 	}
 #endif
 
 }
-
 
 public sealed class CsvReader : CsvReader<IList<string>>
 {
@@ -352,10 +346,15 @@ public sealed class CsvReader : CsvReader<IList<string>>
 			throw new ArgumentNullException(nameof(stream));
 		Contract.EndContractBlock();
 
-		using var sr = new StreamReader(stream);
-		using var csv = new CsvReader(sr);
-		foreach (var row in csv.ReadRows())
-			yield return row;
+		return ReadRowsCore(stream);
+
+		static IEnumerable<IList<string>> ReadRowsCore(Stream stream)
+		{
+			using var sr = new StreamReader(stream);
+			using var csv = new CsvReader(sr);
+			foreach (var row in csv.ReadRows())
+				yield return row;
+		}
 	}
 
 	public static IEnumerable<IList<string>> ReadRows(string csvText)
@@ -363,10 +362,15 @@ public sealed class CsvReader : CsvReader<IList<string>>
 		if (csvText is null) throw new ArgumentNullException(nameof(csvText));
 		Contract.EndContractBlock();
 
-		using var sr = new StringReader(csvText);
-		using var csv = new CsvReader(sr);
-		foreach (var row in csv.ReadRows())
-			yield return row;
+		return ReadRowsCore(csvText);
+
+		static IEnumerable<IList<string>> ReadRowsCore(string csvText)
+		{
+			using var sr = new StringReader(csvText);
+			using var csv = new CsvReader(sr);
+			foreach (var row in csv.ReadRows())
+				yield return row;
+		}
 	}
 
 	public static async ValueTask ReadRowsToChannelAsync(
@@ -378,7 +382,6 @@ public sealed class CsvReader : CsvReader<IList<string>>
 		using var reader = new CsvReader(source);
 		await reader.ReadRowsToChannelAsync(writer, charBufferSize, cancellationToken).ConfigureAwait(false);
 	}
-
 
 	public static IEnumerable<IList<string>> ReadRowsBuffered(
 		TextReader source,
@@ -408,7 +411,7 @@ public sealed class CsvReader : CsvReader<IList<string>>
 		var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read, charBufferSize, true);
 		var sr = new StreamReader(fs);
 		var csv = new CsvReader(sr);
-		_ = csv.ReadRowsToChannelAsync(rowBuffer, charBufferSize, cancellationToken).AsTask().ContinueWith(t =>
+		_ = csv.ReadRowsToChannelAsync(rowBuffer, charBufferSize, cancellationToken).AsTask().ContinueWith(_ =>
 		{
 			csv.Dispose();
 			sr.Dispose();
@@ -452,10 +455,15 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 			throw new ArgumentNullException(nameof(stream));
 		Contract.EndContractBlock();
 
-		using var sr = new StreamReader(stream);
-		using var csv = new CsvMemoryReader(sr);
-		foreach (var row in csv.ReadRows())
-			yield return row;
+		return ReadRowsCore(stream);
+
+		static IEnumerable<IMemoryOwner<string>> ReadRowsCore(Stream stream)
+		{
+			using var sr = new StreamReader(stream);
+			using var csv = new CsvMemoryReader(sr);
+			foreach (var row in csv.ReadRows())
+				yield return row;
+		}
 	}
 
 	public static IEnumerable<IMemoryOwner<string>> ReadRows(string csvText)
@@ -463,10 +471,15 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 		if (csvText is null) throw new ArgumentNullException(nameof(csvText));
 		Contract.EndContractBlock();
 
-		using var sr = new StringReader(csvText);
-		using var csv = new CsvMemoryReader(sr);
-		foreach (var row in csv.ReadRows())
-			yield return row;
+		return ReadRowsCore(csvText);
+
+		static IEnumerable<IMemoryOwner<string>> ReadRowsCore(string csvText)
+		{
+			using var sr = new StringReader(csvText);
+			using var csv = new CsvMemoryReader(sr);
+			foreach (var row in csv.ReadRows())
+				yield return row;
+		}
 	}
 
 	public static async ValueTask ReadRowsToChannelAsync(
@@ -478,7 +491,6 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 		using var reader = new CsvMemoryReader(source);
 		await reader.ReadRowsToChannelAsync(writer, charBufferSize, cancellationToken).ConfigureAwait(false);
 	}
-
 
 	public static IEnumerable<IMemoryOwner<string>> ReadRowsBuffered(
 		TextReader source,
@@ -508,7 +520,7 @@ public sealed class CsvMemoryReader : CsvReader<IMemoryOwner<string>>
 		var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read, charBufferSize, true);
 		var sr = new StreamReader(fs);
 		var csv = new CsvMemoryReader(sr);
-		_ = csv.ReadRowsToChannelAsync(rowBuffer, charBufferSize, cancellationToken).AsTask().ContinueWith(t =>
+		_ = csv.ReadRowsToChannelAsync(rowBuffer, charBufferSize, cancellationToken).AsTask().ContinueWith(_ =>
 		{
 			csv.Dispose();
 			sr.Dispose();

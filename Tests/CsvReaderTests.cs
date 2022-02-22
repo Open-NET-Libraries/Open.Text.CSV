@@ -55,7 +55,6 @@ public static class CsvReaderTests
 		}
 	}
 
-
 	const string TEST_FILE = "PackageAssets.csv";
 
 	static List<IList<string>> StringSplit()

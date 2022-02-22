@@ -34,7 +34,6 @@ public static class CsvRowBuilderTests
 		Assert.Equal(5, remaining.Length);
 	}
 
-
 	[Fact]
 	public static void BasicRowBuildTest2()
 	{

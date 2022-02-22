@@ -31,5 +31,4 @@ public abstract class FileReadBenchmarkBase
 	public bool UseAsync { get; set; } = false;
 
 	protected FileStream GetStream() => GetStream(FileStreamBufferSize, UseAsync);
-
 }

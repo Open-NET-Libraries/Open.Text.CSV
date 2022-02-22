@@ -23,13 +23,19 @@ public class CsvRowTransformer
 
 	public IEnumerable<object?> GetRow(Func<string, object?> values)
 	{
-		if (values is null) throw new ArgumentNullException(nameof(values));
-		Contract.EndContractBlock();
+		return values is null
+			? throw new ArgumentNullException(nameof(values))
+			: GetRowCore();
 
-		var len = HeaderRow.Count;
-		for (var i = 0; i < len; i++)
+		IEnumerable<object?> GetRowCore()
 		{
-			yield return values(HeaderRow[i]);
+			Contract.EndContractBlock();
+
+			var len = HeaderRow.Count;
+			for (var i = 0; i < len; i++)
+			{
+				yield return values(HeaderRow[i]);
+			}
 		}
 	}
 }

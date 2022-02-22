@@ -9,7 +9,6 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 {
 	public FileStreamReadBenchmark(string testFile = null) : base(testFile) { }
 
-
 	/*
 	 * NOTES:
 	 * 
@@ -42,7 +41,10 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 		while ((next = await stream
 			.ReadAsync(mem)
 			.ConfigureAwait(false)) is not 0)
+		{
 			count += next;
+		}
+
 		return count;
 	}
 
@@ -54,7 +56,10 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 		await foreach (var buffer in stream
 			.SingleBufferReadAsync(ByteBufferSize)
 			.ConfigureAwait(false))
+		{
 			count += buffer.Length;
+		}
+
 		return count;
 	}
 
@@ -66,7 +71,10 @@ public class FileStreamReadBenchmark : FileReadBenchmarkBase
 		await foreach (var buffer in stream
 			.DualBufferReadAsync(ByteBufferSize)
 			.ConfigureAwait(false))
+		{
 			count += buffer.Length;
+		}
+
 		return count;
 	}
 

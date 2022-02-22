@@ -21,7 +21,7 @@ public static class CsvUtility
 	}
 
 	public static string FormatValue(string value, bool forceQuotes = false)
-		=> value is null || value.Length == 0
+		=> string.IsNullOrEmpty(value)
 		? string.Empty
 		: forceQuotes || QUOTESNEEDED.IsMatch(value)
 		? WrapQuotes(value)

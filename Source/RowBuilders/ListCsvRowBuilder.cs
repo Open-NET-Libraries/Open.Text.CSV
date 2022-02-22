@@ -75,5 +75,4 @@ public sealed class ListCsvRowBuilder : CsvRowBuilderBase<IList<string>>
 		row = f;
 		return true;
 	}
-
 }
