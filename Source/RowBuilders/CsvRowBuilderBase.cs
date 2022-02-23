@@ -216,7 +216,9 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// If there are not enough to complete a row, an empty segment is returned.
 	/// </param>
 	/// <returns>true if a new row is emitted; otherwise false.</returns>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 	[SuppressMessage("Roslynator", "RCS1242:Do not pass non-read-only struct by read-only reference.", Justification = "ArraySegment non-read-only may be an oversight.")]
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 	public bool Add(in ArraySegment<char> chars, out ArraySegment<char> remaining,
 #if NULL_ANALYSIS
 	[NotNullWhen(true)]

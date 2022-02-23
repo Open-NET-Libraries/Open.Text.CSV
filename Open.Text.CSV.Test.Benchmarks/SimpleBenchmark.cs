@@ -16,7 +16,6 @@ internal class SimpleBenchmark<T>
 		_target = param ?? throw new System.ArgumentNullException(nameof(param));
 	}
 
-
 	protected override IEnumerable<TimedResult> TestOnceInternal()
 	{
 		var methods = _target.GetType().GetMethods()

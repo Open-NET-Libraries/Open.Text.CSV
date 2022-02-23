@@ -14,8 +14,6 @@ namespace Open.Text.CSV;
 
 public class CsvReader<TRow> : IDisposable
 {
-	public const int DEFAULT_BUFFER_SIZE = 4096;
-
 	protected CsvReader(TextReader source, ICsvRowBuilder<TRow> rowBuilder)
 	{
 		_source = source ?? throw new ArgumentNullException(nameof(source));
@@ -47,7 +45,7 @@ public class CsvReader<TRow> : IDisposable
 		TRow? row;
 		var pool = ArrayPool<char>.Shared;
 
-		var buffer = _remaining.Count == 0 ? pool.Rent(DEFAULT_BUFFER_SIZE) : _remaining.Array;
+		var buffer = _remaining.Count == 0 ? pool.Rent(CsvReader.DefaultBufferSize) : _remaining.Array;
 		if (_remaining.Count != 0)
 		{
 			goto add;
@@ -94,7 +92,7 @@ public class CsvReader<TRow> : IDisposable
 		TRow? row;
 		var pool = ArrayPool<char>.Shared;
 
-		var buffer = _remaining.Count == 0 ? pool.Rent(DEFAULT_BUFFER_SIZE) : _remaining.Array;
+		var buffer = _remaining.Count == 0 ? pool.Rent(CsvReader.DefaultBufferSize) : _remaining.Array;
 		if (_remaining.Count != 0)
 		{
 			goto add;
@@ -296,6 +294,8 @@ public class CsvReader<TRow> : IDisposable
 
 public sealed class CsvReader : CsvReader<IList<string>>
 {
+	public const int DefaultBufferSize = 4096;
+
 	public CsvReader(TextReader source)
 		: base(source, new ListCsvRowBuilder())
 	{
@@ -325,7 +325,7 @@ public sealed class CsvReader : CsvReader<IList<string>>
 
 		IList<string>? row;
 		var list = new List<IList<string>>();
-		var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read, DEFAULT_BUFFER_SIZE, true);
+		var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, true);
 		var sr = new StreamReader(fs);
 		var csv = new CsvReader(sr);
 		while ((row = await csv.ReadNextRowAsync().ConfigureAwait(false)) is not null)
