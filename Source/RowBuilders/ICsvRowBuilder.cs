@@ -12,12 +12,12 @@ public interface ICsvRowBuilder<TRow>
 	[NotNullWhen(true)]
 #endif
 	out TRow? row);
-	bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining,
+	bool Add(ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining,
 #if NULL_ANALYSIS
 	[NotNullWhen(true)]
 #endif
 	out TRow? row);
-	bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining,
+	bool Add(ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining,
 #if NULL_ANALYSIS
 	[NotNullWhen(true)]
 #endif

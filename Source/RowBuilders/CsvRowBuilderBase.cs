@@ -251,7 +251,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// Takes all the characters in an ReadOnlySpan and attemtps to add them to the row.
 	/// </summary>
 	/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
-	public bool Add(in ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining,
+	public bool Add(ReadOnlySpan<char> chars, out ReadOnlySpan<char> remaining,
 #if NULL_ANALYSIS
 	[NotNullWhen(true)]
 #endif
@@ -278,7 +278,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 	/// Takes all the characters in an ReadOnlyMemory and attemtps to add them to the row.
 	/// </summary>
 	/// <inheritdoc cref="Add(in ArraySegment{char}, out ArraySegment{char})"/>
-	public bool Add(in ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining,
+	public bool Add(ReadOnlyMemory<char> chars, out ReadOnlyMemory<char> remaining,
 #if NULL_ANALYSIS
 	[NotNullWhen(true)]
 #endif
