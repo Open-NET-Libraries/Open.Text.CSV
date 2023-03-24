@@ -27,7 +27,7 @@ public static class CsvUtility
 		? WrapQuotes(value)
 		: value;
 
-	public static string ExportValue(object? value, bool forceQuotes = false)
+	public static string ExportValue(object? value, bool forceQuotes = false, bool lastElement = false)
 	{
 		if (value is null) return ",";
 		var v = value switch
@@ -38,6 +38,6 @@ public static class CsvUtility
 			_ => value.ToString(),
 		};
 
-		return $"{FormatValue(v!, forceQuotes)},";
+		return $"{FormatValue(v!, forceQuotes)}{(lastElement?"":",")}";
 	}
 }
