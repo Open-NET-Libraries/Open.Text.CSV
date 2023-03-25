@@ -7,8 +7,11 @@ namespace Open.Text.CSV;
 public static class CsvUtility
 {
 	public const string NEWLINE = "\r\n";
-	public static readonly Regex QUOTESNEEDED = new("^\\s+|[,\r\n]|\\s+$");
+	public static readonly Regex QUOTESNEEDED = new(@"^\s+|["",\r\n]|\s+$", RegexOptions.Compiled);
 
+	/// <summary>
+	/// Wraps a string in quotes and escapes any quotes within the string.
+	/// </summary>
 	public static string WrapQuotes(string value)
 	{
 		if (value is null)
@@ -20,24 +23,39 @@ public static class CsvUtility
 #endif
 	}
 
-	public static string FormatValue(string value, bool forceQuotes = false)
+	/// <summary>
+	/// Formats a value for CSV export.
+	/// </summary>
+	public static string FormatValue(
+		string value,
+		bool forceQuotes = false)
 		=> string.IsNullOrEmpty(value)
 		? string.Empty
 		: forceQuotes || QUOTESNEEDED.IsMatch(value)
 		? WrapQuotes(value)
 		: value;
 
-	public static string ExportValue(object? value, bool forceQuotes = false, bool lastElement = false)
+	/// <summary>
+	/// Formats a CSV value. Adds a comma to the end of the string unless <paramref name="omitComma"/> is true.
+	/// </summary>
+	public static string ExportValue(
+		object? value,
+		bool forceQuotes = false,
+		bool omitComma = false)
 	{
-		if (value is null) return ",";
+		if (value is null)
+			return omitComma ? string.Empty : ",";
+
 		var v = value switch
 		{
+			string s => s,
 			DateTime datetime => datetime.TimeOfDay == TimeSpan.Zero ?
 				datetime.ToString("d", CultureInfo.InvariantCulture) : // Use short date.
 				datetime.ToString(CultureInfo.InvariantCulture),
 			_ => value.ToString(),
 		};
 
-		return $"{FormatValue(v!, forceQuotes)}{(lastElement?"":",")}";
+		var formatted = FormatValue(v!, forceQuotes);
+		return omitComma ? formatted : $"{formatted},";
 	}
 }

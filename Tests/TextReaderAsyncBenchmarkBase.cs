@@ -15,17 +15,15 @@ public abstract class TextReaderAsyncBenchmarkBase
 
 	public TextReader GetReader() => new StringReader(Source);
 
-	protected int Consume(ReadOnlyMemory<char> chunk)
+	protected static int Consume(ReadOnlyMemory<char> chunk)
 	{
 		var span = chunk.Span;
 		var len = span.Length;
-		for(var i = 0; i<len; i++)
-		{
+		for (var i = 0; i < len; i++)
 			_ = Read(span, i);
-		}
 		return len;
 	}
 
-	protected char Read(ReadOnlySpan<char> chunk, int index)
+	protected static char Read(ReadOnlySpan<char> chunk, int index)
 		=> chunk[index];
 }

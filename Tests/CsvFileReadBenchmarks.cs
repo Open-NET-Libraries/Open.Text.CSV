@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Open.ChannelExtensions;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -115,12 +114,9 @@ public class CsvFileReadBenchmarks : FileReadBenchmarkBase
 	//[Benchmark]
 	public IList<IList<string>> CsvReader_ReadRowsBuffered()
 	{
-		var rows = new List<IList<string>>();
 		using var stream = GetStream();
 		using var reader = new StreamReader(stream);
-		foreach (var row in CsvReader.ReadRowsBuffered(reader, ROW_BUFFER))
-			rows.Add(row);
-		return rows;
+		return CsvReader.ReadRowsBuffered(reader, ROW_BUFFER).ToList();
 	}
 
 	[Benchmark]

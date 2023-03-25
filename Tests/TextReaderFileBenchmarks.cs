@@ -2,7 +2,6 @@
 using Open.IO.Extensions;
 using System;
 using System.IO;
-using System.IO.Pipelines;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -35,7 +34,7 @@ public class TextReaderFileBenchmarks : FileReadBenchmarkBase
 		var mem = buffer.AsMemory();
 		using var stream = GetStream();
 		using var reader = new StreamReader(stream);
- 		while ((next = await reader.ReadAsync(mem).ConfigureAwait(false)) is not 0)
+		while ((next = await reader.ReadAsync(mem).ConfigureAwait(false)) is not 0)
 			count += next;
 		return count;
 	}

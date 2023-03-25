@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Running;
-using Open.Text.CSV.Test;
+﻿using Open.Text.CSV.Test;
 using Open.Text.CSV.Test.Benchmarks;
 using System;
 using System.IO;

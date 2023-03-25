@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
@@ -309,10 +310,8 @@ public sealed class CsvReader : CsvReader<IList<string>>
 			throw new ArgumentException("Cannot be empty or only whitespace.", nameof(filepath));
 		Contract.EndContractBlock();
 
-		var list = new List<IList<string>>();
 		using var sr = new FileInfo(filepath).OpenText();
-		foreach (var row in ReadRows(sr)) list.Add(row);
-		return list;
+		return ReadRows(sr).ToList();
 	}
 
 	public static async ValueTask<IList<IList<string>>> GetAllRowsFromFileAsync(string filepath)

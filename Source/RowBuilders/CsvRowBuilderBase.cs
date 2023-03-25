@@ -82,7 +82,7 @@ public abstract class CsvRowBuilderBase<TRow> : ICsvRowBuilder<TRow>
 						return false;
 
 					case '\r':
-						if(_state == State.BeforeField) AddEntry();
+						if (_state == State.BeforeField) AddEntry();
 						_state = State.EndOfRow;
 						return false;
 
