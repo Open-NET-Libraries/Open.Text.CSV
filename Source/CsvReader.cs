@@ -75,7 +75,7 @@ public class CsvReader<TRow> : IDisposable
 
 	public bool TryReadNextRow(
 #if NULL_ANALYSIS
-	[NotNullWhen(true)]
+		[NotNullWhen(true)]
 #endif
 		out TRow? row)
 	{

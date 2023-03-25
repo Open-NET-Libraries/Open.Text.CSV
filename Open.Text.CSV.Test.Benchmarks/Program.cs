@@ -14,14 +14,14 @@ if (!File.Exists(filePath)) throw new FileNotFoundException();
 Console.Write("Initializing...");
 var sb = new StringBuilder();
 
-var report = new Open.Diagnostics.BenchmarkConsoleReport<TextReaderBenchmarks>(10, sb, SimpleBenchmark<TextReaderBenchmarks>.Results);
+var report = new Open.Diagnostics.BenchmarkConsoleReport<TextReaderFileBenchmarks>(10, sb, SimpleBenchmark<TextReaderFileBenchmarks>.Results);
 
-report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=false", _ => new TextReaderBenchmarks(filePath)
+report.AddBenchmark(nameof(TextReaderFileBenchmarks) + " UseAsync=false", _ => new TextReaderFileBenchmarks(filePath)
 {
 	UseAsync = false
 });
 
-report.AddBenchmark(nameof(TextReaderBenchmarks) + " UseAsync=true", _ => new TextReaderBenchmarks(filePath)
+report.AddBenchmark(nameof(TextReaderFileBenchmarks) + " UseAsync=true", _ => new TextReaderFileBenchmarks(filePath)
 {
 	UseAsync = true
 });

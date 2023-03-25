@@ -8,9 +8,9 @@ using Xunit;
 
 namespace Open.Text.CSV.Test;
 
-public class TextReaderBenchmarks : FileReadBenchmarkBase
+public class TextReaderFileBenchmarks : FileReadBenchmarkBase
 {
-	public TextReaderBenchmarks(string testFile = null) : base(testFile) { }
+	public TextReaderFileBenchmarks(string testFile = null) : base(testFile) { }
 
 	[Benchmark]
 	public int StreamReader_Read()
@@ -96,7 +96,7 @@ public class TextReaderBenchmarks : FileReadBenchmarkBase
 	}
 }
 
-public class FileReadMethodTests : TextReaderBenchmarks
+public class FileReadMethodTests : TextReaderFileBenchmarks
 {
 	static readonly int ExpectedCharacterCount = GetExpectedCharacterCount();
 
